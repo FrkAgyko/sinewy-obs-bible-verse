@@ -149,24 +149,30 @@
           <input type="color" id="color-ref" value="#c9a84c">
         </div>
       </div>
+      <div class="card-divider" style="margin-top:9px"></div>
+      <label class="checkbox-row">
+        <input type="checkbox" id="show-card-checkbox">
+        <span>Show card overlay on background</span>
+      </label>
     </div>
 
-    <!-- Background image -->
-    <div class="card-divider"></div>
-    <label style="margin-bottom:5px">Background Mode</label>
-    <div class="toggle-group" id="bg-mode-toggle" style="margin-bottom:7px">
-      <button class="toggle-btn active" data-mode="color">Colour</button>
-      <button class="toggle-btn" data-mode="image">Image</button>
-    </div>
-
-    <div id="bg-image-section" style="display:none">
-      <div class="image-upload-area">
-        <label class="btn-upload">
-          Choose Image
-          <input type="file" id="bg-image-input" accept="image/*" hidden>
-        </label>
-        <span id="bg-image-name">No image selected</span>
-        <button class="btn-icon" id="bg-image-clear" title="Remove image">×</button>
+    <!-- Background mode — only visible when theme = Custom -->
+    <div id="bg-mode-section">
+      <div class="card-divider"></div>
+      <label style="margin-bottom:5px">Background Mode</label>
+      <div class="toggle-group" id="bg-mode-toggle" style="margin-bottom:7px">
+        <button class="toggle-btn active" data-mode="color">Colour</button>
+        <button class="toggle-btn" data-mode="image">Image</button>
+      </div>
+      <div id="bg-image-section" style="display:none">
+        <div class="image-upload-area">
+          <label class="btn-upload">
+            Choose Image
+            <input type="file" id="bg-image-input" accept="image/*" hidden>
+          </label>
+          <span id="bg-image-name">No image selected</span>
+          <button class="btn-icon" id="bg-image-clear" title="Remove image">×</button>
+        </div>
       </div>
     </div>
   </div>
@@ -199,6 +205,8 @@
   const opacitySlider   = document.getElementById('opacity-slider');
   const opacityValue    = document.getElementById('opacity-value');
   const customSection   = document.getElementById('custom-colors-section');
+  const bgModeSection   = document.getElementById('bg-mode-section');
+  const showCardCheckbox= document.getElementById('show-card-checkbox');
   const colorBg         = document.getElementById('color-bg');
   const colorText       = document.getElementById('color-text');
   const colorRef        = document.getElementById('color-ref');
@@ -246,19 +254,23 @@
     colorText.value = saved.customColors.text || '#f0e6c4';
     colorRef.value  = saved.customColors.ref  || '#c9a84c';
   }
+  // Default unchecked — only restore true if explicitly saved as true
+  showCardCheckbox.checked = saved.showCard === true;
 
-  if (saved.bgImage) {
-    currentBgImage = saved.bgImage;
-    bgImageName.textContent = 'Saved image';
+  // Only restore bg image state when custom theme is actually active
+  if (themeSel.value === 'custom') {
+    if (saved.bgImage) {
+      currentBgImage = saved.bgImage;
+      bgImageName.textContent = 'Saved image';
+    }
+    if (saved.bgMode === 'image') {
+      bgMode = 'image';
+      setActiveBgModeBtn('image');
+      bgImageSection.style.display = '';
+    }
   }
 
-  if (saved.bgMode === 'image') {
-    bgMode = 'image';
-    setActiveBgModeBtn('image');
-    bgImageSection.style.display = '';
-  }
-
-  updateCustomColorsVisibility();
+  updateThemeUI();
 
   // ── Helpers ───────────────────────────────────────────
 
@@ -298,6 +310,7 @@
   }
 
   function getCurrentState(action) {
+    const isCustom = themeSel.value === 'custom';
     return {
       action,
       reference:    currentReference || refInput.value.trim(),
@@ -308,9 +321,12 @@
       animation:    animationSel.value,
       font:         fontSel.value,
       opacity:      parseInt(opacitySlider.value, 10),
-      bgMode,
-      bgImage:      bgMode === 'image' ? currentBgImage : null,
+      // Preset themes never send a background image — their CSS always wins
+      bgMode:       isCustom ? bgMode : 'color',
+      bgImage:      isCustom && bgMode === 'image' ? currentBgImage : null,
       customColors: { bg: colorBg.value, text: colorText.value, ref: colorRef.value },
+      // Preset themes always show the card; custom respects the checkbox
+      showCard:     isCustom ? showCardCheckbox.checked : true,
       visible:      action === 'show',
       translation:  translationSel.value,
     };
@@ -328,6 +344,7 @@
       bgMode,
       bgImage:      currentBgImage,
       customColors: { bg: colorBg.value, text: colorText.value, ref: colorRef.value },
+      showCard:     showCardCheckbox.checked,
     });
   }
 
@@ -335,12 +352,21 @@
     if (overlayState === 'live') BibleApp.send(getCurrentState('show'));
   }
 
-  function updateCustomColorsVisibility() {
-    if (themeSel.value === 'custom') {
-      customSection.classList.add('visible');
-    } else {
-      customSection.classList.remove('visible');
+  function updateThemeUI(sendUpdate = false) {
+    const isCustom = themeSel.value === 'custom';
+
+    // Custom-only panels
+    customSection.classList.toggle('visible', isCustom);
+    bgModeSection.classList.toggle('visible', isCustom);
+
+    if (!isCustom) {
+      // Reset bg mode controls so they're clean if user returns to Custom later
+      bgMode = 'color';
+      setActiveBgModeBtn('color');
+      bgImageSection.style.display = 'none';
     }
+
+    if (sendUpdate) resendIfLive();
   }
 
   function setActiveBgModeBtn(mode) {
@@ -564,9 +590,14 @@
   // Settings — save + live-update on change
   [themeSel, positionSel, fontSizeSel, animationSel, fontSel].forEach(el => {
     el.addEventListener('change', () => {
-      if (el === themeSel) updateCustomColorsVisibility();
-      saveCurrentSettings();
-      resendIfLive();
+      if (el === themeSel) {
+        // updateThemeUI resets bg state then calls resendIfLive internally
+        updateThemeUI(true);
+        saveCurrentSettings();
+      } else {
+        saveCurrentSettings();
+        resendIfLive();
+      }
     });
   });
 
@@ -585,6 +616,12 @@
       saveCurrentSettings();
       resendIfLive();
     });
+  });
+
+  // Show-card checkbox
+  showCardCheckbox.addEventListener('change', () => {
+    saveCurrentSettings();
+    resendIfLive();
   });
 
   // Background mode toggle

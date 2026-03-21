@@ -75,6 +75,10 @@
         applyClass(SIZE_CLASSES,  `fs-${state.fontSize}`);
         applyClass(ANIM_CLASSES,  `anim-${state.animation}`);
 
+        // ── Card visibility (custom theme only) ───────────────────────
+        const showCard = state.showCard !== false;
+        container.classList.toggle('no-card', !showCard);
+
         // ── Background image (fullscreen layer, independent of card) ──
         if (bgMode === 'image' && state.bgImage) {
           bgLayer.style.backgroundImage = `url(${state.bgImage})`;
@@ -84,9 +88,13 @@
           bgLayer.classList.add('hidden');
         }
 
-        // ── Card background (always the semi-transparent colour) ──────
-        const bgHex = theme === 'custom' ? colors.bg : (THEME_BG[theme] || '#080810');
-        inner.style.background = hexToRgba(bgHex, opacity);
+        // ── Card background ───────────────────────────────────────────
+        if (showCard) {
+          const bgHex = theme === 'custom' ? colors.bg : (THEME_BG[theme] || '#080810');
+          inner.style.background = hexToRgba(bgHex, opacity);
+        } else {
+          inner.style.background = 'transparent';
+        }
 
         // ── Custom text colours ───────────────────────────────────────
         if (theme === 'custom') {

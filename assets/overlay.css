@@ -56,6 +56,28 @@ html, body {
   /* background colour set by JS (theme + opacity slider) */
 }
 
+/* ── No-card mode: text floats directly on background ── */
+
+#verse-container.no-card #verse-inner {
+  border: none;
+  box-shadow: none;
+  /* background set to transparent by JS */
+}
+
+#verse-container.no-card .verse-accent {
+  display: none;
+}
+
+#verse-container.no-card #overlay-text {
+  text-shadow:
+    0 2px 12px rgba(0, 0, 0, 0.95),
+    0 1px 4px  rgba(0, 0, 0, 0.80);
+}
+
+#verse-container.no-card #overlay-reference {
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.95);
+}
+
 /* ── Accent divider line ─────────────────────────────── */
 
 .verse-accent {

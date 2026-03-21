@@ -569,11 +569,45 @@ kbd {
 
 @keyframes spin { to { transform: rotate(360deg); } }
 
+/* ── Checkbox row ────────────────────────────────────── */
+
+.checkbox-row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-muted);
+  text-transform: none;
+  letter-spacing: 0;
+  cursor: pointer;
+}
+
+.checkbox-row input[type="checkbox"] {
+  width: 13px;
+  height: 13px;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--accent-blue);
+  /* reset the generic input styles */
+  padding: 0;
+  border: none;
+  border-radius: 3px;
+  background: transparent;
+  box-shadow: none;
+  appearance: auto;
+  -webkit-appearance: auto;
+}
+
 /* ── Collapsible custom-colours section ──────────────── */
 
-#custom-colors-section {
+#custom-colors-section,
+#bg-mode-section {
   display: none;
 }
-#custom-colors-section.visible {
+
+#custom-colors-section.visible,
+#bg-mode-section.visible {
   display: block;
 }
