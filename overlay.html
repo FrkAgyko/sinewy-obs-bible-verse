@@ -38,6 +38,32 @@
 
       const loadedFonts = new Set();
 
+      // Font size ranges per size class (px)
+      const SIZE_RANGE = {
+        'fs-sm': { min: 28, max: 36 },
+        'fs-md': { min: 36, max: 48 },
+        'fs-lg': { min: 48, max: 60 },
+        'fs-xl': { min: 60, max: 72 },
+      };
+
+      function scaleText(text, sizeClass) {
+        const range = SIZE_RANGE[sizeClass] || SIZE_RANGE['fs-md'];
+        const len   = text.length;
+
+        let size;
+        if (len < 100) {
+          size = range.max;
+        } else if (len > 200) {
+          size = range.min;
+        } else {
+          // Linear interpolation across the 100–200 char range
+          const t = (len - 100) / 100;
+          size = Math.round(range.max - t * (range.max - range.min));
+        }
+
+        textEl.style.fontSize = size + 'px';
+      }
+
       function hexToRgba(hex, alpha) {
         const h = hex.replace('#', '');
         const r = parseInt(h.slice(0, 2), 16);
@@ -121,6 +147,7 @@
         textEl.textContent = state.text;
         refEl.textContent  = state.reference;
         applyStyles(state);
+        scaleText(state.text, `fs-${state.fontSize || 'md'}`);
 
         container.classList.remove('hidden');
         container.classList.remove('visible');
