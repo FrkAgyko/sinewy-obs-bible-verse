@@ -46,7 +46,17 @@
         <option value="asv">ASV</option>
       </select>
     </div>
-    <button class="btn btn-lookup" id="btn-lookup">Lookup</button>
+    <div class="lookup-actions">
+      <button class="btn btn-lookup" id="btn-lookup">Lookup</button>
+      <button class="btn btn-random" id="btn-random">🎲 Random</button>
+    </div>
+    <div id="random-menu" class="random-menu hidden">
+      <button class="random-menu-item" data-cat="bible">📖 Entire Bible</button>
+      <button class="random-menu-item" data-cat="ot">📜 Old Testament</button>
+      <button class="random-menu-item" data-cat="nt">✝ New Testament</button>
+      <button class="random-menu-item" data-cat="gospels">🕊 Gospels only</button>
+      <button class="random-menu-item" data-cat="poetry">🎵 Psalms &amp; Proverbs</button>
+    </div>
   </div>
 
   <!-- Verse Preview & Edit -->
@@ -190,6 +200,8 @@
   const autocompleteList= document.getElementById('autocomplete-list');
   const translationSel  = document.getElementById('translation');
   const btnLookup       = document.getElementById('btn-lookup');
+  const btnRandom       = document.getElementById('btn-random');
+  const randomMenu      = document.getElementById('random-menu');
   const previewRef      = document.getElementById('preview-reference');
   const verseText       = document.getElementById('verse-text');
   const btnPrev         = document.getElementById('btn-prev');
@@ -444,6 +456,60 @@
     showAutocomplete(results);
   }
 
+  // ── Random Verse ──────────────────────────────────────
+
+  const RANDOM_CATEGORIES = {
+    bible:   { pool: () => BibleApp.BIBLE_BOOKS.slice(0, 66) },
+    ot:      { pool: () => BibleApp.BIBLE_BOOKS.slice(0, 39) },
+    nt:      { pool: () => BibleApp.BIBLE_BOOKS.slice(39, 66) },
+    gospels: { pool: () => [39, 40, 41, 42].map(i => BibleApp.BIBLE_BOOKS[i]) },
+    poetry:  { pool: () => [18, 19].map(i => BibleApp.BIBLE_BOOKS[i]) },
+  };
+
+  function closeRandomMenu() {
+    randomMenu.classList.add('hidden');
+  }
+
+  async function doRandomVerse(catKey) {
+    closeRandomMenu();
+
+    const books = RANDOM_CATEGORIES[catKey].pool();
+    btnRandom.disabled = true;
+    btnRandom.classList.add('loading');
+    setStatus('Finding random verse…', 'loading');
+
+    let result, lastRef;
+
+    // Up to 4 attempts: first two try a random verse (1-12),
+    // later attempts fall back to verse 1 of a fresh random chapter.
+    for (let attempt = 0; attempt < 4; attempt++) {
+      const [bookName, , chapters] = books[Math.floor(Math.random() * books.length)];
+      const chapter = Math.floor(Math.random() * chapters) + 1;
+      const verse   = attempt < 2 ? Math.floor(Math.random() * 12) + 1 : 1;
+      lastRef = `${bookName} ${chapter}:${verse}`;
+      result  = await BibleApp.fetchVerse(lastRef, translationSel.value);
+      if (!result.error) break;
+    }
+
+    btnRandom.disabled = false;
+    btnRandom.classList.remove('loading');
+
+    if (result.error) {
+      setStatus(result.error, 'error');
+      return;
+    }
+
+    currentReference       = result.reference;
+    previewRef.textContent = result.reference;
+    verseText.value        = result.text;
+    navRef = BibleApp.parseReference(result.rawRef || lastRef);
+    if (navRef) refInput.value = BibleApp.buildReference(navRef.book, navRef.chapter, navRef.verse);
+    enableControls(true);
+    setStatus(`Random: ${result.reference}`, 'success');
+
+    if (overlayState === 'live') BibleApp.send(getCurrentState('show'));
+  }
+
   // ── Lookup ────────────────────────────────────────────
 
   async function doLookup(ref) {
@@ -524,6 +590,19 @@
   // ── Event listeners ───────────────────────────────────
 
   btnLookup.addEventListener('click', () => doLookup());
+
+  btnRandom.addEventListener('click', (e) => {
+    e.stopPropagation(); // prevent the document click from closing it immediately
+    randomMenu.classList.toggle('hidden');
+  });
+
+  randomMenu.addEventListener('click', (e) => {
+    const item = e.target.closest('.random-menu-item');
+    if (item) doRandomVerse(item.dataset.cat);
+  });
+
+  // Close the menu when clicking anywhere outside it
+  document.addEventListener('click', closeRandomMenu);
 
   refInput.addEventListener('input', handleRefInput);
 

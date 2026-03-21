@@ -285,14 +285,88 @@ textarea {
   transform: none !important;
 }
 
-.btn-lookup {
-  background: var(--accent-blue);
-  color: #fff;
-  width: 100%;
+/* Lookup + Random share a row */
+.lookup-actions {
+  display: flex;
+  gap: 6px;
   margin-top: 4px;
 }
 
+.btn-lookup {
+  background: var(--accent-blue);
+  color: #fff;
+  flex: 1;
+}
+
 .btn-lookup:hover:not(:disabled) { opacity: 0.88; }
+
+/* ── Random Verse button ─────────────────────────────── */
+
+.btn-random {
+  background: #14302e;
+  color: #2dd4bf;
+  border: 1px solid #0d9488;
+  flex-shrink: 0;
+}
+
+.btn-random:hover:not(:disabled) {
+  background: #0d9488;
+  color: #fff;
+}
+
+.btn-random.loading {
+  position: relative;
+  color: transparent;
+}
+
+.btn-random.loading::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 13px;
+  height: 13px;
+  border: 2px solid rgba(45, 212, 191, 0.3);
+  border-top-color: #2dd4bf;
+  border-radius: 50%;
+  animation: spin 0.65s linear infinite;
+}
+
+/* ── Random category dropdown menu ──────────────────── */
+
+.random-menu {
+  margin-top: 5px;
+  background: #111e2a;
+  border: 1px solid rgba(13, 148, 136, 0.55);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.55);
+}
+
+.random-menu.hidden { display: none; }
+
+.random-menu-item {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  border-bottom: 1px solid rgba(13, 148, 136, 0.12);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 500;
+  text-align: left;
+  padding: 7px 12px;
+  cursor: pointer;
+  transition: background 0.1s, color 0.1s;
+}
+
+.random-menu-item:last-child { border-bottom: none; }
+
+.random-menu-item:hover {
+  background: rgba(13, 148, 136, 0.18);
+  color: #2dd4bf;
+}
 
 /* ── Stream controls row ─────────────────────────────── */
 
