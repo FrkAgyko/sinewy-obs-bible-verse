@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bible Verse Overlay</title>
+  <link rel="stylesheet" href="assets/overlay.css">
+</head>
+<body>
+
+  <div id="verse-container" class="hidden theme-gold pos-bottom fs-md anim-fade">
+    <div id="verse-inner">
+      <p id="overlay-text"></p>
+      <span class="verse-accent"></span>
+      <p id="overlay-reference"></p>
+    </div>
+  </div>
+
+  <script src="assets/app.js"></script>
+  <script>
+    (() => {
+      const container = document.getElementById('verse-container');
+      const inner     = document.getElementById('verse-inner');
+      const textEl    = document.getElementById('overlay-text');
+      const refEl     = document.getElementById('overlay-reference');
+
+      const THEME_CLASSES = ['theme-gold', 'theme-white', 'theme-dark', 'theme-custom'];
+      const POS_CLASSES   = ['pos-bottom', 'pos-center', 'pos-top'];
+      const SIZE_CLASSES  = ['fs-sm', 'fs-md', 'fs-lg', 'fs-xl'];
+      const ANIM_CLASSES  = ['anim-fade', 'anim-slide', 'anim-none'];
+
+      // Base background colours for preset themes (JS sets bg with opacity)
+      const THEME_BG = { gold: '#080810', white: '#ffffff', dark: '#0a0e14' };
+
+      const loadedFonts = new Set();
+
+      function hexToRgba(hex, alpha) {
+        const h = hex.replace('#', '');
+        const r = parseInt(h.slice(0, 2), 16);
+        const g = parseInt(h.slice(2, 4), 16);
+        const b = parseInt(h.slice(4, 6), 16);
+        return `rgba(${r}, ${g}, ${b}, ${Math.max(0, Math.min(1, alpha))})`;
+      }
+
+      function ensureFont(fontName) {
+        if (loadedFonts.has(fontName)) return;
+        const font = BibleApp.CHURCH_FONTS.find(f => f.value === fontName);
+        if (font && font.google) {
+          const link = document.createElement('link');
+          link.rel  = 'stylesheet';
+          link.href = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:ital,wght@0,400;0,600;1,400&display=swap`;
+          document.head.appendChild(link);
+        }
+        loadedFonts.add(fontName);
+      }
+
+      function applyClass(group, value) {
+        group.forEach(c => container.classList.remove(c));
+        container.classList.add(value);
+      }
+
+      function applyStyles(state) {
+        const theme     = state.theme     || 'gold';
+        const opacity   = (state.opacity !== undefined ? state.opacity : 90) / 100;
+        const font      = state.font      || 'Georgia';
+        const bgMode    = state.bgMode    || 'color';
+        const colors    = state.customColors || BibleApp.DEFAULTS.customColors;
+
+        applyClass(THEME_CLASSES, `theme-${theme}`);
+        applyClass(POS_CLASSES,   `pos-${state.position}`);
+        applyClass(SIZE_CLASSES,  `fs-${state.fontSize}`);
+        applyClass(ANIM_CLASSES,  `anim-${state.animation}`);
+
+        // ── Background (opacity-aware) ──────────────────────────
+        if (bgMode === 'image' && state.bgImage) {
+          inner.style.background      = '';
+          inner.style.backgroundImage = `url(${state.bgImage})`;
+          inner.style.backgroundSize  = 'cover';
+          inner.style.backgroundPosition = 'center';
+        } else {
+          const bgHex = theme === 'custom' ? colors.bg : (THEME_BG[theme] || '#080810');
+          inner.style.backgroundImage = '';
+          inner.style.background      = hexToRgba(bgHex, opacity);
+        }
+
+        // ── Custom colours (text/reference) ────────────────────
+        if (theme === 'custom') {
+          textEl.style.color = colors.text || '#ffffff';
+          refEl.style.color  = colors.ref  || '#cccccc';
+          inner.style.setProperty('--accent-color', colors.ref || '#cccccc');
+        } else {
+          textEl.style.color = '';
+          refEl.style.color  = '';
+          inner.style.removeProperty('--accent-color');
+        }
+
+        // ── Font ────────────────────────────────────────────────
+        ensureFont(font);
+        inner.style.fontFamily = `'${font}', Georgia, 'Times New Roman', serif`;
+      }
+
+      function showVerse(state) {
+        textEl.textContent = state.text;
+        refEl.textContent  = state.reference;
+        applyStyles(state);
+
+        container.classList.remove('hidden');
+        container.classList.remove('visible');
+        void container.offsetHeight; // force reflow
+        container.classList.add('visible');
+      }
+
+      function hideVerse(state) {
+        applyStyles(state);
+        container.classList.remove('visible');
+
+        const fallback = setTimeout(() => container.classList.add('hidden'), 650);
+        container.addEventListener('transitionend', () => {
+          clearTimeout(fallback);
+          container.classList.add('hidden');
+        }, { once: true });
+      }
+
+      function clearVerse() {
+        container.classList.remove('visible');
+        container.classList.add('hidden');
+        textEl.textContent = '';
+        refEl.textContent  = '';
+      }
+
+      function handleMessage(state) {
+        switch (state.action) {
+          case 'show':  showVerse(state);  break;
+          case 'hide':  hideVerse(state);  break;
+          case 'clear': clearVerse();      break;
+        }
+      }
+
+      BibleApp.initChannel('overlay', handleMessage);
+    })();
+  </script>
+
+</body>
+</html>

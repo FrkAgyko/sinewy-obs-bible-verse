@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bible Verse Controller</title>
+  <link rel="stylesheet" href="assets/dock.css">
+</head>
+<body>
+
+<div id="app">
+
+  <!-- Header -->
+  <header>
+    <h1>✝ Bible Verse</h1>
+    <div class="status-row">
+      <span class="status-label" id="status-label">Off</span>
+      <div class="status-dot" id="status-dot"></div>
+    </div>
+  </header>
+
+  <!-- Lookup -->
+  <div class="card">
+    <div class="card-title">Verse Lookup</div>
+    <div class="lookup-row">
+      <div class="ref-wrap">
+        <input
+          type="text"
+          id="ref-input"
+          placeholder="e.g. John 3:16"
+          autocomplete="off"
+          spellcheck="false"
+        >
+        <ul id="autocomplete-list" class="autocomplete-list hidden"></ul>
+      </div>
+      <select id="translation" title="Bible translation">
+        <option value="kjv">KJV</option>
+        <option value="web">WEB</option>
+        <option value="asv">ASV</option>
+      </select>
+    </div>
+    <button class="btn btn-lookup" id="btn-lookup">Lookup</button>
+  </div>
+
+  <!-- Verse Preview & Edit -->
+  <div class="card">
+    <div class="card-title">Verse Text</div>
+    <p id="preview-reference"></p>
+    <textarea
+      id="verse-text"
+      placeholder="Verse text will appear here after lookup, or type manually…"
+    ></textarea>
+  </div>
+
+  <!-- Stream Controls -->
+  <div class="card">
+    <div class="card-title">Stream Controls</div>
+    <div class="controls-row">
+      <button class="btn btn-prev" id="btn-prev" title="Previous verse (←)" disabled>◀</button>
+      <button class="btn btn-show" id="btn-show" disabled>Show</button>
+      <button class="btn btn-hide" id="btn-hide" disabled>Hide</button>
+      <button class="btn btn-clear" id="btn-clear" disabled>Clear</button>
+      <button class="btn btn-next" id="btn-next" title="Next verse (→)" disabled>▶</button>
+    </div>
+    <div class="kbd-hint">
+      <kbd>←</kbd><kbd>→</kbd> prev/next &nbsp;·&nbsp;
+      <kbd>Esc</kbd> hide &nbsp;·&nbsp;
+      <kbd>Ctrl</kbd>+<kbd>↵</kbd> show
+    </div>
+  </div>
+
+  <!-- Display Settings -->
+  <div class="card">
+    <div class="card-title">Display Settings</div>
+
+    <div class="settings-grid">
+      <label>
+        Font
+        <select id="font-sel"></select>
+      </label>
+      <label>
+        Font Size
+        <select id="font-size">
+          <option value="sm">Small</option>
+          <option value="md" selected>Medium</option>
+          <option value="lg">Large</option>
+          <option value="xl">X-Large</option>
+        </select>
+      </label>
+      <label>
+        Theme
+        <select id="theme">
+          <option value="gold">Classic Gold</option>
+          <option value="white">Clean White</option>
+          <option value="dark">Dark Minimal</option>
+          <option value="custom">Custom…</option>
+        </select>
+      </label>
+      <label>
+        Position
+        <select id="position">
+          <option value="bottom">Bottom</option>
+          <option value="center">Center</option>
+          <option value="top">Top</option>
+        </select>
+      </label>
+      <label>
+        Animation
+        <select id="animation">
+          <option value="fade">Fade</option>
+          <option value="slide">Slide Up</option>
+          <option value="none">None</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Opacity -->
+    <div class="card-divider"></div>
+    <label style="margin-bottom:5px">
+      Background Opacity
+      <div class="slider-row">
+        <input type="range" id="opacity-slider" min="0" max="100" value="90" step="1">
+        <span class="slider-value" id="opacity-value">90%</span>
+      </div>
+    </label>
+
+    <!-- Custom colours (shown when theme = custom) -->
+    <div id="custom-colors-section">
+      <div class="card-divider"></div>
+      <div class="card-title" style="margin-bottom:7px">Custom Colours</div>
+      <div class="color-row">
+        <div class="color-item">
+          <span>Background</span>
+          <input type="color" id="color-bg" value="#080810">
+        </div>
+        <div class="color-item">
+          <span>Verse Text</span>
+          <input type="color" id="color-text" value="#f0e6c4">
+        </div>
+        <div class="color-item">
+          <span>Reference</span>
+          <input type="color" id="color-ref" value="#c9a84c">
+        </div>
+      </div>
+    </div>
+
+    <!-- Background image -->
+    <div class="card-divider"></div>
+    <label style="margin-bottom:5px">Background Mode</label>
+    <div class="toggle-group" id="bg-mode-toggle" style="margin-bottom:7px">
+      <button class="toggle-btn active" data-mode="color">Colour</button>
+      <button class="toggle-btn" data-mode="image">Image</button>
+    </div>
+
+    <div id="bg-image-section" style="display:none">
+      <div class="image-upload-area">
+        <label class="btn-upload">
+          Choose Image
+          <input type="file" id="bg-image-input" accept="image/*" hidden>
+        </label>
+        <span id="bg-image-name">No image selected</span>
+        <button class="btn-icon" id="bg-image-clear" title="Remove image">×</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Status Bar -->
+  <div id="status-bar"></div>
+
+</div>
+
+<script src="assets/app.js"></script>
+<script>
+(() => {
+  // ── DOM refs ──────────────────────────────────────────
+  const refInput        = document.getElementById('ref-input');
+  const autocompleteList= document.getElementById('autocomplete-list');
+  const translationSel  = document.getElementById('translation');
+  const btnLookup       = document.getElementById('btn-lookup');
+  const previewRef      = document.getElementById('preview-reference');
+  const verseText       = document.getElementById('verse-text');
+  const btnPrev         = document.getElementById('btn-prev');
+  const btnShow         = document.getElementById('btn-show');
+  const btnHide         = document.getElementById('btn-hide');
+  const btnClear        = document.getElementById('btn-clear');
+  const btnNext         = document.getElementById('btn-next');
+  const themeSel        = document.getElementById('theme');
+  const positionSel     = document.getElementById('position');
+  const fontSizeSel     = document.getElementById('font-size');
+  const animationSel    = document.getElementById('animation');
+  const fontSel         = document.getElementById('font-sel');
+  const opacitySlider   = document.getElementById('opacity-slider');
+  const opacityValue    = document.getElementById('opacity-value');
+  const customSection   = document.getElementById('custom-colors-section');
+  const colorBg         = document.getElementById('color-bg');
+  const colorText       = document.getElementById('color-text');
+  const colorRef        = document.getElementById('color-ref');
+  const bgModeToggle    = document.getElementById('bg-mode-toggle');
+  const bgImageSection  = document.getElementById('bg-image-section');
+  const bgImageInput    = document.getElementById('bg-image-input');
+  const bgImageName     = document.getElementById('bg-image-name');
+  const bgImageClear    = document.getElementById('bg-image-clear');
+  const statusBar       = document.getElementById('status-bar');
+  const statusDot       = document.getElementById('status-dot');
+  const statusLabel     = document.getElementById('status-label');
+
+  // ── State ─────────────────────────────────────────────
+  let currentReference  = '';  // display string e.g. "John 3:16 — KJV"
+  let navRef            = null; // { book, chapter, verse } for next/prev
+  let overlayState      = 'off';
+  let currentBgImage    = null; // base64 data URL or null
+  let bgMode            = 'color';
+  let acItems           = [];   // current autocomplete results
+  let acIndex           = -1;   // active autocomplete index
+
+  // ── Populate font selector ────────────────────────────
+  BibleApp.CHURCH_FONTS.forEach(f => {
+    const opt = document.createElement('option');
+    opt.value       = f.value;
+    opt.textContent = f.label;
+    fontSel.appendChild(opt);
+  });
+
+  // ── Init ──────────────────────────────────────────────
+  BibleApp.initChannel('dock', () => {});
+
+  const saved = BibleApp.loadSettings();
+  translationSel.value = saved.translation || 'kjv';
+  themeSel.value       = saved.theme       || 'gold';
+  positionSel.value    = saved.position    || 'bottom';
+  fontSizeSel.value    = saved.fontSize    || 'md';
+  animationSel.value   = saved.animation   || 'fade';
+  fontSel.value        = saved.font        || 'Georgia';
+  opacitySlider.value  = saved.opacity     !== undefined ? saved.opacity : 90;
+  opacityValue.textContent = opacitySlider.value + '%';
+
+  if (saved.customColors) {
+    colorBg.value   = saved.customColors.bg   || '#080810';
+    colorText.value = saved.customColors.text || '#f0e6c4';
+    colorRef.value  = saved.customColors.ref  || '#c9a84c';
+  }
+
+  if (saved.bgImage) {
+    currentBgImage = saved.bgImage;
+    bgImageName.textContent = 'Saved image';
+  }
+
+  if (saved.bgMode === 'image') {
+    bgMode = 'image';
+    setActiveBgModeBtn('image');
+    bgImageSection.style.display = '';
+  }
+
+  updateCustomColorsVisibility();
+
+  // ── Helpers ───────────────────────────────────────────
+
+  function setStatus(msg, type = '') {
+    statusBar.textContent = msg;
+    statusBar.className   = type ? `is-${type}` : '';
+    if (type !== 'loading' && msg) {
+      setTimeout(() => {
+        if (statusBar.textContent === msg) {
+          statusBar.textContent = '';
+          statusBar.className   = '';
+        }
+      }, 4000);
+    }
+  }
+
+  function setDotState(state) {
+    overlayState = state;
+    statusDot.className = 'status-dot';
+    if (state === 'live') {
+      statusDot.classList.add('live');
+      statusLabel.textContent = 'Live';
+    } else if (state === 'hidden') {
+      statusDot.classList.add('hidden-state');
+      statusLabel.textContent = 'Hidden';
+    } else {
+      statusLabel.textContent = 'Off';
+    }
+  }
+
+  function enableControls(hasVerse) {
+    btnShow.disabled  = !hasVerse;
+    btnHide.disabled  = !hasVerse;
+    btnClear.disabled = !hasVerse;
+    btnPrev.disabled  = !hasVerse || !navRef;
+    btnNext.disabled  = !hasVerse || !navRef;
+  }
+
+  function getCurrentState(action) {
+    return {
+      action,
+      reference:    currentReference || refInput.value.trim(),
+      text:         verseText.value.trim(),
+      theme:        themeSel.value,
+      position:     positionSel.value,
+      fontSize:     fontSizeSel.value,
+      animation:    animationSel.value,
+      font:         fontSel.value,
+      opacity:      parseInt(opacitySlider.value, 10),
+      bgMode,
+      bgImage:      bgMode === 'image' ? currentBgImage : null,
+      customColors: { bg: colorBg.value, text: colorText.value, ref: colorRef.value },
+      visible:      action === 'show',
+      translation:  translationSel.value,
+    };
+  }
+
+  function saveCurrentSettings() {
+    BibleApp.saveSettings({
+      translation:  translationSel.value,
+      theme:        themeSel.value,
+      position:     positionSel.value,
+      fontSize:     fontSizeSel.value,
+      animation:    animationSel.value,
+      font:         fontSel.value,
+      opacity:      parseInt(opacitySlider.value, 10),
+      bgMode,
+      bgImage:      currentBgImage,
+      customColors: { bg: colorBg.value, text: colorText.value, ref: colorRef.value },
+    });
+  }
+
+  function resendIfLive() {
+    if (overlayState === 'live') BibleApp.send(getCurrentState('show'));
+  }
+
+  function updateCustomColorsVisibility() {
+    if (themeSel.value === 'custom') {
+      customSection.classList.add('visible');
+    } else {
+      customSection.classList.remove('visible');
+    }
+  }
+
+  function setActiveBgModeBtn(mode) {
+    bgModeToggle.querySelectorAll('.toggle-btn').forEach(b => {
+      b.classList.toggle('active', b.dataset.mode === mode);
+    });
+  }
+
+  // ── Autocomplete ──────────────────────────────────────
+
+  function showAutocomplete(items) {
+    autocompleteList.innerHTML = '';
+    if (!items.length) {
+      hideAutocomplete();
+      return;
+    }
+    acItems = items;
+    acIndex = -1;
+    items.forEach((name, i) => {
+      const li = document.createElement('li');
+      li.className     = 'autocomplete-item';
+      li.textContent   = name;
+      li.dataset.index = i;
+      li.addEventListener('mousedown', (e) => {
+        e.preventDefault(); // prevent input blur
+        selectAutocomplete(i);
+      });
+      autocompleteList.appendChild(li);
+    });
+    autocompleteList.classList.remove('hidden');
+  }
+
+  function hideAutocomplete() {
+    autocompleteList.classList.add('hidden');
+    acItems = [];
+    acIndex = -1;
+  }
+
+  function selectAutocomplete(idx) {
+    const book = acItems[idx];
+    if (!book) return;
+    // Insert book name into input, preserving any chapter:verse already typed
+    const current = refInput.value;
+    const spaceIdx = current.indexOf(' ');
+    const rest = spaceIdx >= 0 ? current.slice(spaceIdx) : '';
+    refInput.value = book + rest;
+    hideAutocomplete();
+    refInput.focus();
+    // Move cursor to end
+    refInput.selectionStart = refInput.selectionEnd = refInput.value.length;
+  }
+
+  function moveAutocomplete(dir) {
+    if (!acItems.length) return;
+    acIndex = Math.max(-1, Math.min(acItems.length - 1, acIndex + dir));
+    autocompleteList.querySelectorAll('.autocomplete-item').forEach((el, i) => {
+      el.classList.toggle('active', i === acIndex);
+    });
+  }
+
+  function handleRefInput() {
+    const val = refInput.value;
+    // Only autocomplete if we're still typing the book name (no chapter yet)
+    const hasChapter = /\d+:\d+/.test(val) || /^\S+\s+\d+$/.test(val);
+    if (!val.trim() || hasChapter) {
+      hideAutocomplete();
+      return;
+    }
+    // Extract the book fragment (everything before a digit+colon or just the whole string)
+    const bookFragment = val.replace(/\s+\d+.*$/, '');
+    const results = BibleApp.searchBooks(bookFragment);
+    // Don't show autocomplete if the typed value already exactly matches a book
+    const exact = results.length === 1 && results[0].toLowerCase() === bookFragment.toLowerCase();
+    if (exact) { hideAutocomplete(); return; }
+    showAutocomplete(results);
+  }
+
+  // ── Lookup ────────────────────────────────────────────
+
+  async function doLookup(ref) {
+    ref = (ref || refInput.value).trim();
+    if (!ref) {
+      setStatus('Enter a reference first (e.g. John 3:16).', 'error');
+      refInput.focus();
+      return;
+    }
+
+    hideAutocomplete();
+    btnLookup.disabled = true;
+    btnLookup.classList.add('loading');
+    setStatus('Fetching verse…', 'loading');
+
+    const result = await BibleApp.fetchVerse(ref, translationSel.value);
+
+    btnLookup.disabled = false;
+    btnLookup.classList.remove('loading');
+
+    if (result.error) {
+      setStatus(result.error, 'error');
+      return;
+    }
+
+    currentReference       = result.reference;
+    previewRef.textContent = result.reference;
+    verseText.value        = result.text;
+
+    // Parse raw ref for navigation (API returns e.g. "John 3:16")
+    navRef = BibleApp.parseReference(result.rawRef || ref);
+    if (navRef) {
+      refInput.value = BibleApp.buildReference(navRef.book, navRef.chapter, navRef.verse);
+    }
+
+    enableControls(true);
+    setStatus(`Loaded: ${result.reference}`, 'success');
+  }
+
+  // ── Next / Previous ───────────────────────────────────
+
+  async function navigateVerse(delta) {
+    if (!navRef) return;
+
+    const { book, chapter, verse } = navRef;
+    const newVerse = verse + delta;
+
+    if (newVerse < 1) {
+      // Go to previous chapter, verse 1 (we don't know last verse of prev chapter)
+      if (chapter <= 1) { setStatus('Already at the beginning.', ''); return; }
+      await doLookup(BibleApp.buildReference(book, chapter - 1, 1));
+    } else {
+      const ref = BibleApp.buildReference(book, chapter, newVerse);
+      const result = await BibleApp.fetchVerse(ref, translationSel.value);
+
+      if (result.error) {
+        // Likely past the last verse — try next chapter
+        if (delta > 0) {
+          await doLookup(BibleApp.buildReference(book, chapter + 1, 1));
+        } else {
+          setStatus(result.error, 'error');
+        }
+      } else {
+        // Apply directly without going through doLookup UI flow
+        currentReference       = result.reference;
+        previewRef.textContent = result.reference;
+        verseText.value        = result.text;
+        navRef = BibleApp.parseReference(result.rawRef || ref);
+        if (navRef) refInput.value = BibleApp.buildReference(navRef.book, navRef.chapter, navRef.verse);
+        enableControls(true);
+        // Live-update overlay if visible
+        if (overlayState === 'live') BibleApp.send(getCurrentState('show'));
+        setStatus(`${result.reference}`, 'success');
+      }
+    }
+  }
+
+  // ── Event listeners ───────────────────────────────────
+
+  btnLookup.addEventListener('click', () => doLookup());
+
+  refInput.addEventListener('input', handleRefInput);
+
+  refInput.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowDown') { e.preventDefault(); moveAutocomplete(1); return; }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); moveAutocomplete(-1); return; }
+    if (e.key === 'Escape')    { hideAutocomplete(); return; }
+    if (e.key === 'Enter') {
+      if (acIndex >= 0 && acItems.length) {
+        e.preventDefault();
+        selectAutocomplete(acIndex);
+      } else {
+        hideAutocomplete();
+        doLookup();
+      }
+    }
+  });
+
+  refInput.addEventListener('blur', () => {
+    // Delay so mousedown on autocomplete item fires first
+    setTimeout(hideAutocomplete, 150);
+  });
+
+  verseText.addEventListener('input', () => {
+    enableControls(verseText.value.trim().length > 0);
+  });
+
+  verseText.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      btnShow.click();
+    }
+  });
+
+  btnShow.addEventListener('click', () => {
+    const text = verseText.value.trim();
+    if (!text) { setStatus('No verse text to display.', 'error'); return; }
+    BibleApp.send(getCurrentState('show'));
+    setDotState('live');
+    setStatus('Verse shown on stream.', 'success');
+  });
+
+  btnHide.addEventListener('click', () => {
+    BibleApp.send(getCurrentState('hide'));
+    setDotState('hidden');
+    setStatus('Verse hidden.', '');
+  });
+
+  btnClear.addEventListener('click', () => {
+    BibleApp.send({ action: 'clear', visible: false, reference: '', text: '' });
+    previewRef.textContent = '';
+    verseText.value        = '';
+    currentReference       = '';
+    refInput.value         = '';
+    navRef                 = null;
+    enableControls(false);
+    setDotState('off');
+    setStatus('Cleared.', '');
+  });
+
+  btnPrev.addEventListener('click', () => navigateVerse(-1));
+  btnNext.addEventListener('click', () => navigateVerse(1));
+
+  // Settings — save + live-update on change
+  [themeSel, positionSel, fontSizeSel, animationSel, fontSel].forEach(el => {
+    el.addEventListener('change', () => {
+      if (el === themeSel) updateCustomColorsVisibility();
+      saveCurrentSettings();
+      resendIfLive();
+    });
+  });
+
+  translationSel.addEventListener('change', saveCurrentSettings);
+
+  // Opacity slider
+  opacitySlider.addEventListener('input', () => {
+    opacityValue.textContent = opacitySlider.value + '%';
+    saveCurrentSettings();
+    resendIfLive();
+  });
+
+  // Custom colour pickers
+  [colorBg, colorText, colorRef].forEach(el => {
+    el.addEventListener('input', () => {
+      saveCurrentSettings();
+      resendIfLive();
+    });
+  });
+
+  // Background mode toggle
+  bgModeToggle.addEventListener('click', (e) => {
+    const btn = e.target.closest('.toggle-btn');
+    if (!btn) return;
+    bgMode = btn.dataset.mode;
+    setActiveBgModeBtn(bgMode);
+    bgImageSection.style.display = bgMode === 'image' ? '' : 'none';
+    saveCurrentSettings();
+    resendIfLive();
+  });
+
+  // Background image upload
+  bgImageInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+
+    img.onload = () => {
+      const MAX_W = 1920, MAX_H = 1080;
+      let w = img.width, h = img.height;
+      if (w > MAX_W || h > MAX_H) {
+        const scale = Math.min(MAX_W / w, MAX_H / h);
+        w = Math.round(w * scale);
+        h = Math.round(h * scale);
+      }
+      const canvas = document.createElement('canvas');
+      canvas.width  = w;
+      canvas.height = h;
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+      currentBgImage = canvas.toDataURL('image/jpeg', 0.82);
+      URL.revokeObjectURL(url);
+      bgImageName.textContent = file.name;
+      saveCurrentSettings();
+      resendIfLive();
+    };
+
+    img.onerror = () => {
+      URL.revokeObjectURL(url);
+      setStatus('Could not load image.', 'error');
+    };
+
+    img.src = url;
+    // Reset input so same file can be re-selected
+    bgImageInput.value = '';
+  });
+
+  bgImageClear.addEventListener('click', () => {
+    currentBgImage          = null;
+    bgImageName.textContent = 'No image selected';
+    saveCurrentSettings();
+    resendIfLive();
+  });
+
+  // ── Global keyboard shortcuts ─────────────────────────
+  document.addEventListener('keydown', (e) => {
+    const tag     = document.activeElement.tagName;
+    const inInput = tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT';
+
+    if (e.key === 'Escape' && !inInput) {
+      btnHide.click();
+    } else if (e.key === 'ArrowRight' && !inInput) {
+      e.preventDefault();
+      navigateVerse(1);
+    } else if (e.key === 'ArrowLeft' && !inInput) {
+      e.preventDefault();
+      navigateVerse(-1);
+    }
+  });
+})();
+</script>
+
+</body>
+</html>
