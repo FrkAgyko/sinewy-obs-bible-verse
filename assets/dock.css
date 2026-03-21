@@ -674,6 +674,42 @@ kbd {
   -webkit-appearance: auto;
 }
 
+/* ── Font row (select + italic toggle) ──────────────── */
+
+.font-row {
+  display: flex;
+  gap: 4px;
+}
+
+.font-row select { flex: 1; min-width: 0; }
+
+.btn-italic {
+  background: var(--bg-input);
+  color: var(--text-muted);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  padding: 6px 9px;
+  font-style: italic;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: Georgia, serif;
+  cursor: pointer;
+  flex-shrink: 0;
+  line-height: 1;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.btn-italic:hover:not(.active) {
+  background: var(--border);
+  color: var(--text);
+}
+
+.btn-italic.active {
+  background: rgba(56, 139, 253, 0.18);
+  border-color: var(--accent-blue);
+  color: var(--accent-blue);
+}
+
 /* ── Collapsible custom-colours section ──────────────── */
 
 #custom-colors-section,

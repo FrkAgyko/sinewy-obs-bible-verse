@@ -93,7 +93,10 @@
     <div class="settings-grid">
       <label>
         Font
-        <select id="font-sel"></select>
+        <div class="font-row">
+          <select id="font-sel"></select>
+          <button id="btn-italic" class="btn-italic" type="button" title="Italic">I</button>
+        </div>
       </label>
       <label>
         Font Size
@@ -215,6 +218,7 @@
   const fontSizeSel     = document.getElementById('font-size');
   const animationSel    = document.getElementById('animation');
   const fontSel         = document.getElementById('font-sel');
+  const btnItalic       = document.getElementById('btn-italic');
   const opacitySlider   = document.getElementById('opacity-slider');
   const opacityValue    = document.getElementById('opacity-value');
   const customSection   = document.getElementById('custom-colors-section');
@@ -238,6 +242,7 @@
   let overlayState      = 'off';
   let currentBgImage    = null; // base64 data URL or null
   let bgMode            = 'color';
+  let isItalic          = false;
   let acItems           = [];   // current autocomplete results
   let acIndex           = -1;   // active autocomplete index
 
@@ -259,6 +264,8 @@
   fontSizeSel.value    = saved.fontSize    || 'md';
   animationSel.value   = saved.animation   || 'fade';
   fontSel.value        = saved.font        || 'Open Sans';
+  isItalic             = saved.italic === true;
+  btnItalic.classList.toggle('active', isItalic);
   opacitySlider.value  = saved.opacity     !== undefined ? saved.opacity : 90;
   opacityValue.textContent = opacitySlider.value + '%';
 
@@ -333,6 +340,7 @@
       fontSize:     fontSizeSel.value,
       animation:    animationSel.value,
       font:         fontSel.value,
+      italic:       isItalic,
       opacity:      parseInt(opacitySlider.value, 10),
       // Preset themes never send a background image — their CSS always wins
       bgMode:       isCustom ? bgMode : 'color',
@@ -353,6 +361,7 @@
       fontSize:     fontSizeSel.value,
       animation:    animationSel.value,
       font:         fontSel.value,
+      italic:       isItalic,
       opacity:      parseInt(opacitySlider.value, 10),
       bgMode,
       bgImage:      currentBgImage,
@@ -679,6 +688,13 @@
         resendIfLive();
       }
     });
+  });
+
+  btnItalic.addEventListener('click', () => {
+    isItalic = !isItalic;
+    btnItalic.classList.toggle('active', isItalic);
+    saveCurrentSettings();
+    resendIfLive();
   });
 
   translationSel.addEventListener('change', saveCurrentSettings);

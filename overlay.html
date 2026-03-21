@@ -114,6 +114,7 @@
         // ── Font ──────────────────────────────────────────────────────
         ensureFont(font);
         inner.style.fontFamily = `'${font}', Georgia, 'Times New Roman', serif`;
+        textEl.style.fontStyle = state.italic ? 'italic' : 'normal';
       }
 
       function showVerse(state) {

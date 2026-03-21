@@ -61,6 +61,7 @@ const BibleApp = (() => {
     timestamp:    0,
     opacity:      90,
     font:         'Open Sans',
+    italic:       false,
     bgMode:       'color',
     bgImage:      null,
     customColors: { bg: '#080810', text: '#f0e6c4', ref: '#c9a84c' },
