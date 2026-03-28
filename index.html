@@ -224,6 +224,7 @@
 <script src="assets/app.js"></script>
 <script>
 (() => {
+  try {
   // ── DOM refs ──────────────────────────────────────────
   const refInput        = document.getElementById('ref-input');
   const autocompleteList= document.getElementById('autocomplete-list');
@@ -403,7 +404,9 @@
   }
 
   function resendIfLive() {
-    if (overlayState === 'live') BibleApp.send(getCurrentState('show'));
+    if (overlayState !== 'live') return;
+    if (!verseText.value || verseText.value.trim() === '') return;
+    BibleApp.send(getCurrentState('show'));
   }
 
   function updateThemeUI(sendUpdate = false) {
@@ -885,6 +888,9 @@
       navigateVerse(-1);
     }
   });
+  } catch (e) {
+    console.error('[BibleApp] dock init failed:', e);
+  }
 })();
 </script>
 

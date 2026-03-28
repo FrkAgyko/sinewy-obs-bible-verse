@@ -82,7 +82,9 @@ const BibleApp = (() => {
     }
 
     window.addEventListener('storage', (e) => {
-      if (e.key === STATE_KEY && e.newValue) _dispatch(JSON.parse(e.newValue));
+      if (e.key === STATE_KEY && e.newValue) {
+        try { _dispatch(JSON.parse(e.newValue)); } catch (_) {}
+      }
     });
 
     setInterval(() => {
