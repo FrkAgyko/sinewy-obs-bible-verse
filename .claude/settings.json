@@ -1,7 +1,5 @@
 {
   "permissions": {
-    "allow": [
-      "Read(//Users/frkagyko/Desktop/Projects/sinewy-obs-bible-verse/NR==1,/^  \\\\];/**)"
-    ]
+    "allow": []
   }
 }
