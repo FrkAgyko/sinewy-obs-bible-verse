@@ -23,22 +23,23 @@
       to   { opacity: 0; }
     }
 
-    .anim-fade #verse-inner {
-      animation: fadeIn 0.6s ease forwards;
-      transition: none !important;
-    }
-    .anim-slide #verse-inner {
-      animation: slideUp 0.6s ease forwards;
-      transition: none !important;
-    }
-    .pos-top.anim-slide #verse-inner {
-      animation: slideDown 0.6s ease forwards;
-    }
-    .anim-none #verse-inner {
+    /* Animations target the text wrapper only. Background/panel never
+       fades or slides — but it IS allowed to smoothly transition its
+       min-height / max-height so long verses can grow the panel
+       gracefully within the 30vh–90vh range. */
+    #verse-inner {
       animation: none !important;
-      transition: none !important;
       opacity: 1 !important;
       transform: none !important;
+      max-height: 90vh !important;
+      transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+                  min-height 0.6s cubic-bezier(0.4, 0, 0.2, 1) !important;
+      will-change: max-height, min-height !important;
+    }
+    #verse-text-wrap {
+      width: 100%;
+      opacity: 1;
+      transition: none;
     }
 
     /* ── Position fix ───────────────────────────────────────────────────
@@ -80,9 +81,11 @@
 
   <div id="verse-container" class="hidden theme-gold pos-bottom fs-md anim-fade">
     <div id="verse-inner">
-      <p id="overlay-text"></p>
-      <span class="verse-accent"></span>
-      <p id="overlay-reference"></p>
+      <div id="verse-text-wrap">
+        <p id="overlay-text"></p>
+        <span class="verse-accent"></span>
+        <p id="overlay-reference"></p>
+      </div>
     </div>
   </div>
 
@@ -93,6 +96,7 @@
       const bgLayer   = document.getElementById('bg-layer');
       const container = document.getElementById('verse-container');
       const inner     = document.getElementById('verse-inner');
+      const textWrap  = document.getElementById('verse-text-wrap');
       const textEl    = document.getElementById('overlay-text');
       const refEl     = document.getElementById('overlay-reference');
 
@@ -231,38 +235,97 @@
       }
 
       function showVerse(state) {
-        inner.style.animation = ''; // clear any in-progress hide animation
-        textEl.textContent = state.text;
-        refEl.textContent  = state.reference;
-        applyStyles(state);
-        scaleText(state.text, `fs-${state.fontSize || 'md'}`);
+        // If the panel is already visible, treat this as Next/Previous navigation.
+        const wasVisible = !container.classList.contains('hidden');
 
+        // Clear any in-progress text animation.
+        inner.style.animation = '';
+        textWrap.style.animation = '';
+
+        applyStyles(state);
+
+        // Background/panel appears instantly — never animates.
         container.classList.remove('hidden');
 
-        const animVal = state.animation || 'fade';
-        if (animVal !== 'none') {
-          const animClass = `anim-${animVal}`;
-          container.classList.remove(animClass);
-          void container.offsetWidth; // force reflow so animation replays
-          container.classList.add(animClass);
+        const animVal   = state.animation || 'fade';
+        const sizeClass = `fs-${state.fontSize || 'md'}`;
+
+        const swapText = () => {
+          textEl.textContent = state.text;
+          refEl.textContent  = state.reference;
+          scaleText(state.text, sizeClass);
+        };
+
+        const animateTextIn = () => {
+          if (animVal === 'none') {
+            textWrap.style.animation = '';
+            textWrap.style.opacity   = '1';
+            textWrap.style.transform = 'none';
+            return;
+          }
+          const animName = (animVal === 'slide')
+            ? (container.classList.contains('pos-top') ? 'slideDown' : 'slideUp')
+            : 'fadeIn';
+          textWrap.style.animation = 'none';
+          void textWrap.offsetWidth; // force reflow so animation replays
+          textWrap.style.animation = `${animName} 0.6s ease forwards`;
+        };
+
+        if (wasVisible && animVal !== 'none') {
+          // NEXT/PREVIOUS: quick 0.2s fade of old text, then animate new text in.
+          textWrap.style.animation = 'none';
+          void textWrap.offsetWidth;
+          textWrap.style.animation = 'fadeOut 0.2s ease forwards';
+
+          let done = false;
+          const advance = () => {
+            if (done) return;
+            done = true;
+            swapText();
+            animateTextIn();
+          };
+          const fallback = setTimeout(advance, 230);
+          textWrap.addEventListener('animationend', () => {
+            clearTimeout(fallback);
+            advance();
+          }, { once: true });
+        } else {
+          // Fresh show (or anim-none while visible): swap and animate in immediately.
+          swapText();
+          animateTextIn();
         }
       }
 
       function hideVerse(state) {
         applyStyles(state);
-        inner.style.animation = 'fadeOut 0.5s ease forwards';
 
-        const fallback = setTimeout(() => {
-          inner.style.animation = '';
+        const animVal = state.animation || 'fade';
+
+        // anim-none: background and text disappear instantly together.
+        if (animVal === 'none') {
+          textWrap.style.animation = '';
           container.classList.add('hidden');
           bgLayer.classList.add('hidden');
-        }, 650);
+          return;
+        }
 
-        inner.addEventListener('animationend', () => {
+        // Text animates out first, then the background/panel is hidden.
+        textWrap.style.animation = 'none';
+        void textWrap.offsetWidth;
+        textWrap.style.animation = 'fadeOut 0.5s ease forwards';
+
+        let done = false;
+        const finish = () => {
+          if (done) return;
+          done = true;
+          textWrap.style.animation = '';
+          container.classList.add('hidden');
+          bgLayer.classList.add('hidden');
+        };
+        const fallback = setTimeout(finish, 650);
+        textWrap.addEventListener('animationend', () => {
           clearTimeout(fallback);
-          inner.style.animation = '';
-          container.classList.add('hidden');
-          bgLayer.classList.add('hidden');
+          finish();
         }, { once: true });
       }
 

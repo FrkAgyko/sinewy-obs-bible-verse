@@ -284,3 +284,7 @@ Found a bug or have a feature idea? Open an issue on GitHub — all feedback is 
 MIT — see [LICENSE](LICENSE).
 
 Free for church use, personal use, and commercial use. You are welcome to modify and redistribute this project as long as you include the original licence file.
+
+## Development Note
+
+This project was developed with the assistance of AI tools to accelerate development.

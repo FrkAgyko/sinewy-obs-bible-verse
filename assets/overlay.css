@@ -59,6 +59,7 @@ html, body {
 #verse-inner {
   width: 100%;
   height: 100%;
+  max-height: 90vh;
   margin: 0;
   padding: 36px 52px 30px;
   border-radius: 14px;
@@ -67,6 +68,9 @@ html, body {
   display: flex;
   flex-direction: column;
   justify-content: center;
+  transition: max-height 0.6s cubic-bezier(0.4, 0, 0.2, 1),
+              min-height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  will-change: max-height, min-height;
   /* background set by JS (theme colour, opacity, or image) */
 }
 
@@ -222,29 +226,24 @@ html, body {
 .fs-lg #overlay-reference { font-size: 1.33rem; }
 .fs-xl #overlay-reference { font-size: 1.58rem; }
 
-/* ── Animations ──────────────────────────────────────── */
+/* Font-size-responsive min-height for the card. Max-height and       */
+/* transitions stay on the base #verse-inner rule; only the min-height */
+/* floor grows with the selected font size.                            */
+#verse-container.fs-sm #verse-inner { min-height: 22vh; }
+#verse-container.fs-md #verse-inner { min-height: 30vh; }
+#verse-container.fs-lg #verse-inner { min-height: 38vh; }
+#verse-container.fs-xl #verse-inner { min-height: 46vh; }
 
-/* Fade */
-.anim-fade #verse-inner {
-  opacity: 0;
-  transition: opacity 0.55s ease;
-}
-.anim-fade.visible #verse-inner { opacity: 1; }
+/* ── Text wrapper (animation target) ─────────────────── */
+/* The background/panel (#verse-inner) never animates.    */
+/* All fade/slide animations are applied to this wrapper  */
+/* via inline styles from overlay.html's script.          */
 
-/* Slide up */
-.anim-slide #verse-inner {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.anim-slide.visible #verse-inner {
+#verse-text-wrap {
+  width: 100%;
   opacity: 1;
-  transform: translateY(0);
+  /* Keep the text wrapper free of its own transitions so    */
+  /* panel height changes never interfere with JS-driven    */
+  /* fade/slide animations on the text.                     */
+  transition: none;
 }
-
-.pos-center.anim-slide #verse-inner         { transform: translateY(18px); }
-.pos-center.anim-slide.visible #verse-inner { transform: translateY(0); }
-
-/* None */
-.anim-none #verse-inner            { opacity: 0; transition: none; }
-.anim-none.visible #verse-inner    { opacity: 1; }
