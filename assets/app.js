@@ -7,7 +7,20 @@ const BibleApp = (() => {
   const CHANNEL_NAME  = 'obs-bible-verse';
   const STATE_KEY     = 'obs-bible-verse-state';
   const SETTINGS_KEY  = 'obs-bible-verse-settings';
-  const API_BASE      = 'https://bible-api.com/';
+  const API_BASE      = 'https://bolls.life';
+  const TRANSLATION_MAP = {
+    'kjv': 'KJV', 'asv': 'ASV', 'web': 'WEB',
+    'webbe': 'WEBBE', 'bbe': 'BBE', 'darby': 'DARBY',
+    'ylt': 'YLT', 'dra': 'DRB', 'nkjv': 'NKJV',
+    'niv': 'NIV', 'niv2011': 'NIV2011', 'esv': 'ESV',
+    'nlt': 'NLT', 'nasb': 'NASB', 'rsv': 'RSV',
+    'amp': 'AMP', 'msg': 'MSG', 'csb17': 'CSB17',
+    'net': 'NET', 'gnv': 'GNV', 'lsv': 'LSV',
+    'bsb': 'BSB', 'mev': 'MEV', 'cev': 'CEVD',
+    'isv': 'ISV', 'erv': 'ERV', 'nlv': 'NLV',
+    'gnt': 'GNT', 'almeida': 'ALM21',
+    'synodal': 'SYNOD', 'cuv': 'CUV'
+  };
   const POLL_INTERVAL = 80;
 
   // ── Bible book data: [fullName, abbreviation, chapterCount] ──────────────
@@ -124,31 +137,93 @@ const BibleApp = (() => {
   }
 
   async function fetchVerse(reference, translation) {
-    if (!reference.trim()) return { error: 'Please enter a reference (e.g. John 3:16).' };
-    const encoded = reference.trim().toLowerCase().replace(/\s+/g, '+');
-    const url = `${API_BASE}${encodeURIComponent(encoded)}?translation=${translation}`;
+    if (!reference || !reference.trim()) {
+      return { error: 'Please enter a verse reference.' };
+    }
+
     try {
-      const res = await fetch(url);
-      if (!res.ok) {
-        if (res.status === 404) return { error: `"${reference}" not found. Check the book name and chapter/verse.` };
-        return { error: `API error ${res.status}. Please try again.` };
+      const parsed = BibleApp.parseReference(reference.trim());
+      if (!parsed) {
+        return { error: 'Could not understand that reference. Try "John 3:16".' };
       }
-      const data = await res.json();
+
+      const { book, chapter, verse, endVerse } = parsed;
+
+      const bookIndex = BIBLE_BOOKS.findIndex(b =>
+        b[0].toLowerCase() === book.toLowerCase() ||
+        (b[1] && b[1].toLowerCase() === book.toLowerCase())
+      );
+
+      if (bookIndex === -1) {
+        return { error: `Book "${book}" not found.` };
+      }
+
+      const bookId = bookIndex + 1;
+      const translationCode = TRANSLATION_MAP[translation.toLowerCase()]
+        || translation.toUpperCase();
+
+      let verses = [];
+
+      if (endVerse && endVerse > verse) {
+        // Multi-verse range — fetch each verse individually
+        for (let v = verse; v <= endVerse; v++) {
+          const url = `${API_BASE}/get-verse/${translationCode}/${bookId}/${chapter}/${v}/`;
+          const res = await fetch(url);
+          if (!res.ok) {
+            return { error: `Verse not found. Check the reference and translation.` };
+          }
+          const data = await res.json();
+          verses.push(data);
+        }
+      } else {
+        // Single verse
+        const url = `${API_BASE}/get-verse/${translationCode}/${bookId}/${chapter}/${verse}/`;
+        const res = await fetch(url);
+        if (!res.ok) {
+          if (res.status === 404) {
+            return { error: `"${reference}" not found. Check the book name, chapter and verse.` };
+          }
+          return { error: `API error ${res.status}. Please try again.` };
+        }
+        const data = await res.json();
+        verses.push(data);
+      }
+
+      // Combine text from all verses
+      const combinedText = verses
+        .map(v => buildDisplayText(v.text))
+        .join(' ');
+
+      // Build reference string locally
+      const bookName = BIBLE_BOOKS[bookIndex][0];
+      const verseRef = endVerse && endVerse > verse
+        ? `${chapter}:${verse}-${endVerse}`
+        : `${chapter}:${verse}`;
+      const displayRef = `${bookName} ${verseRef}`;
+      const formattedRef = `${displayRef} — ${translationCode}`;
+
       return {
-        reference: _formatReference(data.reference, translation.toUpperCase()),
-        text:      buildDisplayText(data.text),
-        rawRef:    data.reference, // original un-formatted for nav parsing
+        reference: formattedRef,
+        text: combinedText,
+        rawRef: displayRef
       };
+
     } catch (err) {
-      return err.name === 'TypeError'
-        ? { error: 'Network error. Check your internet connection.' }
-        : { error: `Unexpected error: ${err.message}` };
+      if (err instanceof TypeError) {
+        return { error: 'Network error. Check your internet connection.' };
+      }
+      return { error: 'An unexpected error occurred. Please try again.' };
     }
   }
 
   function buildDisplayText(raw) {
     if (!raw) return '';
-    return raw.replace(/\n\d+\s*/g, ' ').replace(/\s+/g, ' ').trim();
+    return raw
+      .replace(/<S>\d+<\/S>/g, '')  // Strip Strong's numbers
+      .replace(/<[^>]+>/g, '')       // Strip all HTML tags
+      .replace(/\n\d+\s*/g, ' ')    // Strip verse numbers
+      .replace(/\s+/g, ' ')          // Collapse whitespace
+      .trim();
   }
 
   /** Parse "John 3:16" or "1 Corinthians 13:4" into parts. */
@@ -206,7 +281,8 @@ const BibleApp = (() => {
 
   function _formatReference(raw, translation) {
     if (!raw) return '';
-    return `${raw.replace(/\b\w/g, c => c.toUpperCase())} — ${translation}`;
+    if (raw.includes(' — ')) return raw;
+    return `${raw} — ${translation}`;
   }
 
   return {

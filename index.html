@@ -46,8 +46,8 @@
   <!-- Lookup -->
   <div class="card">
     <div class="card-title">Verse Lookup</div>
-    <div class="lookup-row">
-      <div class="ref-wrap">
+    <div class="lookup-row" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:nowrap;overflow:hidden;">
+      <div class="ref-wrap" style="width:42%;flex:none;box-sizing:border-box;">
         <input
           type="text"
           id="ref-input"
@@ -57,16 +57,77 @@
         >
         <ul id="autocomplete-list" class="autocomplete-list hidden"></ul>
       </div>
-      <select id="translation" title="Bible translation">
-        <option value="kjv">KJV — King James Version</option>
-        <option value="asv">ASV — American Standard Version</option>
-        <option value="web">WEB — World English Bible</option>
-        <option value="webbe">WEBBE — World English Bible British</option>
-        <option value="bbe">BBE — Bible in Basic English</option>
-        <option value="darby">DBY — Darby Translation</option>
-        <option value="ylt">YLT — Young's Literal (NT Only)</option>
-        <option value="dra">DRA — Douay-Rheims</option>
+      <div style="width:25%;flex:none;box-sizing:border-box;min-width:0;">
+        <label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:4px;">Language</label>
+        <select id="language" title="Language" style="width:100%;min-width:0;">
+          <option value="" disabled>Language</option>
+          <option value="english" selected>English</option>
+          <option value="french">French</option>
+          <option value="portuguese">Portuguese</option>
+          <option value="spanish">Spanish</option>
+          <option value="swahili">Swahili</option>
+          <option value="arabic">Arabic</option>
+          <option value="chinese">Chinese</option>
+          <option value="german">German</option>
+          <option value="russian">Russian</option>
+        </select>
+      </div>
+      <div style="width:30%;flex:none;box-sizing:border-box;min-width:0;">
+        <label style="font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:0.1em;color:var(--text-muted);margin-bottom:4px;">Bible</label>
+        <select id="translation" title="Bible translation" style="width:100%;max-width:100%;overflow:hidden;text-overflow:ellipsis;min-width:0;box-sizing:border-box;">
+        <option value="kjv" data-language="english" selected>KJV — King James Version</option>
+        <option value="nkjv" data-language="english">NKJV — New King James Version</option>
+        <option value="niv" data-language="english">NIV — New International Version (1984)</option>
+        <option value="niv2011" data-language="english">NIV2011 — New International Version (2011)</option>
+        <option value="esv" data-language="english">ESV — English Standard Version</option>
+        <option value="nlt" data-language="english">NLT — New Living Translation</option>
+        <option value="nasb" data-language="english">NASB — New American Standard Bible</option>
+        <option value="amp" data-language="english">AMP — Amplified Bible</option>
+        <option value="msg" data-language="english">MSG — The Message</option>
+        <option value="csb17" data-language="english">CSB — Christian Standard Bible</option>
+        <option value="web" data-language="english">WEB — World English Bible</option>
+        <option value="webbe" data-language="english">WEBBE — World English Bible British</option>
+        <option value="asv" data-language="english">ASV — American Standard Version</option>
+        <option value="bbe" data-language="english">BBE — Bible in Basic English</option>
+        <option value="darby" data-language="english">DBY — Darby Translation</option>
+        <option value="ylt" data-language="english">YLT — Young's Literal (NT Only)</option>
+        <option value="dra" data-language="english">DRB — Douay-Rheims</option>
+        <option value="rsv" data-language="english">RSV — Revised Standard Version</option>
+        <option value="net" data-language="english">NET — New English Translation</option>
+        <option value="gnv" data-language="english">GNV — Geneva Bible (1599)</option>
+        <option value="lsv" data-language="english">LSV — Literal Standard Version</option>
+        <option value="bsb" data-language="english">BSB — Berean Standard Bible</option>
+        <option value="mev" data-language="english">MEV — Modern English Version</option>
+        <option value="isv" data-language="english">ISV — International Standard Version</option>
+        <option value="erv" data-language="english">ERV — Easy-to-Read Version</option>
+        <option value="gnt" data-language="english">GNT — Good News Bible</option>
+        <option value="nbs" data-language="french">NBS — Nouvelle Bible Segond</option>
+        <option value="frlsg" data-language="french">LSG — Louis Segond 1910</option>
+        <option value="frdby" data-language="french">DBY — Darby French</option>
+        <option value="frpdv17" data-language="french">PDV — Parole de Vie</option>
+        <option value="bds" data-language="french">BDS — Bible du Semeur</option>
+        <option value="ara" data-language="portuguese">ARA — Almeida Revista e Atualizada</option>
+        <option value="acf11" data-language="portuguese">ACF — Almeida Corrigida Fiel</option>
+        <option value="nvipt" data-language="portuguese">NVI-PT — Nova Versão Internacional</option>
+        <option value="ntlh" data-language="portuguese">NTLH — Nova Tradução na Linguagem de Hoje</option>
+        <option value="arc09" data-language="portuguese">ARC — Almeida Revista e Corrigida</option>
+        <option value="rv1960" data-language="spanish">RV1960 — Reina Valera 1960</option>
+        <option value="rv2004" data-language="spanish">RV2004 — Reina Valera 2004</option>
+        <option value="nvi" data-language="spanish">NVI — Nueva Versión Internacional</option>
+        <option value="pdt" data-language="spanish">PDT — Palabra de Dios para Todos</option>
+        <option value="ntv" data-language="spanish">NTV — Nueva Traducción Viviente</option>
+        <option value="suv" data-language="swahili">SUV — Swahili Union Version</option>
+        <option value="nav" data-language="arabic">NAV — New Arabic Version</option>
+        <option value="svd" data-language="arabic">SVD — Smith & Van Dyke</option>
+        <option value="cuv" data-language="chinese">CUV — Chinese Union Version</option>
+        <option value="cunp" data-language="chinese">CUNP — Chinese Union New Punctuation</option>
+        <option value="elb" data-language="german">ELB — Elberfelder Bibel</option>
+        <option value="lut" data-language="german">LUT — Luther Bibel 2017</option>
+        <option value="sch" data-language="german">SCH — Schlachter 2000</option>
+        <option value="synodal" data-language="russian">SYNOD — Russian Synodal</option>
+        <option value="nrt" data-language="russian">NRT — New Russian Translation</option>
       </select>
+      </div>
     </div>
     <div id="cv-row" class="cv-row hidden">
       <select id="chapter-sel" title="Chapter"></select>
@@ -237,6 +298,7 @@
   const verseSel        = document.getElementById('verse-sel');
   const cvRow           = document.getElementById('cv-row');
   const autoShowCb      = document.getElementById('auto-show-cb');
+  const languageSel     = document.getElementById('language');
   const translationSel  = document.getElementById('translation');
   const btnLookup       = document.getElementById('btn-lookup');
   const btnRandom       = document.getElementById('btn-random');
@@ -328,6 +390,26 @@
   }
 
   updateThemeUI();
+
+  // ── Language filter ──────────────────────────────────
+  languageSel.addEventListener('change', function() {
+    const selectedLang = this.value;
+    const options = translationSel.querySelectorAll('option');
+
+    let firstVisible = null;
+    options.forEach(opt => {
+      if (opt.dataset.language === selectedLang) {
+        opt.style.display = '';
+        if (!firstVisible) firstVisible = opt;
+      } else {
+        opt.style.display = 'none';
+      }
+    });
+
+    if (firstVisible) {
+      translationSel.value = firstVisible.value;
+    }
+  });
 
   // ── Helpers ───────────────────────────────────────────
 
