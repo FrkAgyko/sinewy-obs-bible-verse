@@ -37,7 +37,9 @@ A free, open-source tool for OBS Studio that lets you show Bible verses on your 
 - **3 positions** — Bottom (default), Center, or Top of screen
 - **3 animation styles** — Fade, Slide Up, or None
 - **Keyboard shortcuts** — control everything from your keyboard without touching the mouse
-- **Multiple Bible translations** — KJV (default), WEB, and ASV
+- **50+ Bible translations** — KJV (default), NKJV, NIV, ESV, NLT, NASB, AMP, MSG, CSB, WEB, ASV, BBE, Darby, YLT, RSV, NET, and many more
+- **Multi-language support** — 9 languages including English, French, Portuguese, Spanish, Swahili, Arabic, Chinese, German and Russian
+- **Language selector** — filter Bible translations by language for multilingual church services
 - **Settings are remembered** — all your choices are saved automatically and restored next time you open OBS
 - **No internet required for display** — once a verse is loaded, the overlay works offline
 
@@ -205,13 +207,51 @@ You can control the overlay from your keyboard without clicking. These shortcuts
 
 ## Bible Translations
 
+Verse text is fetched from [Bolls.life](https://bolls.life). Over 50 translations are available across 9 languages.
+
+### English (26 translations)
+
 | Translation | Full Name | Notes |
 |-------------|-----------|-------|
 | KJV | King James Version | Default. Most widely used in churches |
+| NKJV | New King James Version | Modern update of KJV |
+| NIV | New International Version (1984) | Popular modern translation |
+| NIV2011 | New International Version (2011) | Updated NIV |
+| ESV | English Standard Version | Essentially literal translation |
+| NLT | New Living Translation | Easy to read, thought-for-thought |
+| NASB | New American Standard Bible | Highly literal |
+| AMP | Amplified Bible | Expanded wording for clarity |
+| MSG | The Message | Contemporary paraphrase |
+| CSB | Christian Standard Bible | Balance of accuracy and readability |
 | WEB | World English Bible | Modern language. Completely free to use |
-| ASV | American Standard Version | Classic 1901 translation. Free to use |
+| WEBBE | World English Bible (British) | British English edition |
+| ASV | American Standard Version | Classic 1901 translation |
+| BBE | Bible in Basic English | Simple vocabulary |
+| DBY | Darby Translation | Literal 19th-century translation |
+| YLT | Young's Literal Translation | NT only |
+| DRB | Douay-Rheims | Catholic translation |
+| RSV | Revised Standard Version | Mid-20th century revision of ASV |
+| NET | New English Translation | With extensive translators' notes |
+| GNV | Geneva Bible (1599) | Historic Protestant Bible |
+| LSV | Literal Standard Version | Modern literal translation |
+| BSB | Berean Standard Bible | Free modern translation |
+| MEV | Modern English Version | Based on KJV textual tradition |
+| ISV | International Standard Version | Modern scholarly translation |
+| ERV | Easy-to-Read Version | Simplified English |
+| GNT | Good News Bible | Simple, clear language |
 
-> **Note:** NIV, ESV, and NLT are copyright protected and not available through the free verse lookup service. If you use one of these translations in your church, you can still type or paste the verse text manually into the text box after looking up the reference.
+### Other Languages
+
+| Language | Translations Available |
+|----------|----------------------|
+| French | NBS, LSG (Louis Segond 1910), DBY French, PDV, BDS |
+| Portuguese | ARA, ACF, NVI-PT, NTLH, ARC |
+| Spanish | RV1960, RV2004, NVI, PDT, NTV |
+| Swahili | SUV (Swahili Union Version) |
+| Arabic | NAV (New Arabic Version), SVD (Smith & Van Dyke) |
+| Chinese | CUV (Chinese Union Version), CUNP |
+| German | ELB (Elberfelder), LUT (Luther 2017), SCH (Schlachter 2000) |
+| Russian | SYNOD (Russian Synodal), NRT (New Russian Translation) |
 
 ---
 
@@ -251,7 +291,7 @@ Most common abbreviations are accepted — `Ps`, `Rev`, `Matt`, `1 Cor`, `Phil`,
 
 ### Verse text is not loading when I click Lookup
 
-- Check your internet connection — the lookup needs access to bible-api.com
+- Check your internet connection — the lookup needs access to bolls.life
 - Make sure your reference is formatted correctly, e.g. `John 3:16` not `John3:16`
 - If the service is temporarily unavailable, type the verse text directly into the text box
 
