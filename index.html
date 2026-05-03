@@ -46,7 +46,7 @@
   <!-- Lookup -->
   <div class="card">
     <div class="card-title">Verse Lookup</div>
-    <div class="lookup-row" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:nowrap;overflow:hidden;">
+    <div class="lookup-row" style="display:flex;gap:8px;align-items:flex-end;flex-wrap:nowrap;">
       <div class="ref-wrap" style="width:42%;flex:none;box-sizing:border-box;">
         <input
           type="text"
@@ -844,7 +844,7 @@
   refInput.addEventListener('focus', () => {
     const val = refInput.value.trim();
     const hasChapter = /\d+:\d+/.test(val) || /^\S+\s+\d+$/.test(val);
-    if (!val || hasChapter) return;
+    if (hasChapter) return;
     const bookFragment = val.replace(/\s+\d+.*$/, '');
     const results = bookFragment
       ? BibleApp.searchBooks(bookFragment)
