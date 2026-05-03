@@ -84,6 +84,7 @@ const BibleApp = (() => {
   let _lastTimestamp = 0;
   let _onMessage     = null;
   let _verseCountCache = {};
+  let _searchCache = {};
 
   function initChannel(role, onMessage) {
     _onMessage = onMessage;
@@ -243,6 +244,33 @@ const BibleApp = (() => {
     }
   }
 
+  async function searchScripture(translationCode, query) {
+    const key = `${translationCode}|${query.toLowerCase().trim()}`;
+    if (_searchCache[key]) return _searchCache[key];
+    try {
+      const url = `${API_BASE}/search/${translationCode}/${encodeURIComponent(query.trim())}/`;
+      const res = await fetch(url);
+      if (!res.ok) return { error: 'Search unavailable. Check your connection.' };
+      const data = await res.json();
+      if (!Array.isArray(data)) return { error: 'Unexpected response from search API.' };
+      const results = data.slice(0, 50).map(v => ({
+        bookId:  v.book,
+        chapter: v.chapter,
+        verse:   v.verse,
+        text:    v.text ? v.text
+          .replace(/<S>\d+<\/S>/g, '')
+          .replace(/<[^>]+>/g, '')
+          .replace(/([a-zA-Z])\d+/g, '$1')
+          .replace(/\s+/g, ' ')
+          .trim() : '',
+      }));
+      _searchCache[key] = results;
+      return results;
+    } catch {
+      return { error: 'Search unavailable. Check your connection.' };
+    }
+  }
+
   /** Parse "John 3:16" or "1 Corinthians 13:4" into parts. */
   function parseReference(str) {
     const m = str.trim().match(/^(.+?)\s+(\d+):(\d+)(?:-(\d+))?$/);
@@ -304,7 +332,7 @@ const BibleApp = (() => {
 
   return {
     initChannel, send, fetchVerse, buildDisplayText,
-    fetchVerseCount,
+    fetchVerseCount, searchScripture,
     parseReference, buildReference, searchBooks,
     saveSettings, loadSettings,
     DEFAULTS, BIBLE_BOOKS, CHURCH_FONTS, TRANSLATION_MAP,
