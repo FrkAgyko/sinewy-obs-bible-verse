@@ -521,7 +521,7 @@
 
   // ── Book / Chapter / Verse selectors ─────────────────
 
-  function populateChapters(bookName) {
+  async function populateChapters(bookName) {
     const entry = BibleApp.BIBLE_BOOKS.find(([name]) => name === bookName);
     if (!entry) return;
     chapterSel.innerHTML = '';
@@ -530,7 +530,7 @@
       opt.value = opt.textContent = i;
       chapterSel.appendChild(opt);
     }
-    populateVerses();
+    await populateVerses();
   }
 
   async function populateVerses() {
@@ -840,6 +840,17 @@
   document.addEventListener('click', closeRandomMenu);
 
   refInput.addEventListener('input', handleRefInput);
+
+  refInput.addEventListener('focus', () => {
+    const val = refInput.value.trim();
+    const hasChapter = /\d+:\d+/.test(val) || /^\S+\s+\d+$/.test(val);
+    if (!val || hasChapter) return;
+    const bookFragment = val.replace(/\s+\d+.*$/, '');
+    const results = bookFragment
+      ? BibleApp.searchBooks(bookFragment)
+      : BibleApp.BIBLE_BOOKS.map(([name]) => name);
+    showAutocomplete(results);
+  });
 
   refInput.addEventListener('keydown', (e) => {
     if (e.key === 'ArrowDown') { e.preventDefault(); moveAutocomplete(1); return; }
