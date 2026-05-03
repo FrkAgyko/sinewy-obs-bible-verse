@@ -104,26 +104,18 @@
     </div>
   </div>
 
-  <!-- Quick Reference -->
-  <div class="card card--quick-ref">
-    <div class="card-title">Quick Reference</div>
-    <div class="lookup-row" style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap;">
-      <div class="ref-wrap" style="flex:1;min-width:0;box-sizing:border-box;">
-        <input
-          type="text"
-          id="ref-input"
-          placeholder="e.g. John 3:16 or 1 Cor 13:4"
-          autocomplete="off"
-          spellcheck="false"
-        >
-      </div>
+  <!-- Scripture Search -->
+  <div class="card card--scripture-search" id="scripture-search-card">
+    <div class="card-title" id="scripture-search-toggle" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
+      Scripture Search <span id="search-toggle-icon">▶</span>
     </div>
-    <div class="lookup-actions">
-      <button class="btn btn-lookup" id="btn-lookup">Lookup</button>
-      <label class="auto-show-label" title="Automatically show verse on stream after lookup">
-        <input type="checkbox" id="auto-show-cb" checked>
-        <span>Auto Show</span>
-      </label>
+    <div id="scripture-search-body" style="display:none;">
+      <div style="display:flex;gap:8px;margin-bottom:8px;">
+        <input type="text" id="search-input" placeholder="e.g. Jesus wept" autocomplete="off" spellcheck="false" style="flex:1;min-width:0;">
+        <button class="btn btn-lookup" id="btn-search">Search</button>
+      </div>
+      <div id="search-status" style="font-size:11px;color:var(--text-muted);margin-bottom:6px;display:none;"></div>
+      <ul id="search-results" class="search-results hidden"></ul>
     </div>
   </div>
 
@@ -160,18 +152,26 @@
     </div>
   </div>
 
-  <!-- Scripture Search -->
-  <div class="card card--scripture-search" id="scripture-search-card">
-    <div class="card-title" id="scripture-search-toggle" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;">
-      Scripture Search <span id="search-toggle-icon">▶</span>
-    </div>
-    <div id="scripture-search-body" style="display:none;">
-      <div style="display:flex;gap:8px;margin-bottom:8px;">
-        <input type="text" id="search-input" placeholder="e.g. Jesus wept" autocomplete="off" spellcheck="false" style="flex:1;min-width:0;">
-        <button class="btn btn-lookup" id="btn-search">Search</button>
+  <!-- Quick Reference -->
+  <div class="card card--quick-ref">
+    <div class="card-title">Quick Reference</div>
+    <div class="lookup-row" style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap;">
+      <div class="ref-wrap" style="flex:1;min-width:0;box-sizing:border-box;">
+        <input
+          type="text"
+          id="ref-input"
+          placeholder="e.g. John 3:16 or 1 Cor 13:4"
+          autocomplete="off"
+          spellcheck="false"
+        >
       </div>
-      <div id="search-status" style="font-size:11px;color:var(--text-muted);margin-bottom:6px;display:none;"></div>
-      <ul id="search-results" class="search-results hidden"></ul>
+    </div>
+    <div class="lookup-actions">
+      <button class="btn btn-lookup" id="btn-lookup">Lookup</button>
+      <label class="auto-show-label" title="Automatically show verse on stream after lookup">
+        <input type="checkbox" id="auto-show-cb" checked>
+        <span>Auto Show</span>
+      </label>
     </div>
   </div>
 
