@@ -51,7 +51,7 @@
         <input
           type="text"
           id="ref-input"
-          placeholder="e.g. John 3:16"
+          placeholder="Book name or John 3:16"
           autocomplete="off"
           spellcheck="false"
         >
@@ -533,9 +533,24 @@
     populateVerses();
   }
 
-  function populateVerses() {
+  async function populateVerses() {
     verseSel.innerHTML = '';
-    for (let i = 1; i <= 50; i++) {
+    const loading = document.createElement('option');
+    loading.textContent = 'Loading...';
+    loading.disabled = true;
+    verseSel.appendChild(loading);
+
+    const entry = BibleApp.BIBLE_BOOKS.find(([name]) => name === selectedBook);
+    if (!entry) return;
+    const bookId = BibleApp.BIBLE_BOOKS.indexOf(entry) + 1;
+    const rawTranslation = translationSel.value;
+    const translationCode = BibleApp.TRANSLATION_MAP[rawTranslation.toLowerCase()] || rawTranslation.toUpperCase();
+    const chapter = parseInt(chapterSel.value, 10) || 1;
+
+    const count = await BibleApp.fetchVerseCount(translationCode, bookId, chapter);
+
+    verseSel.innerHTML = '';
+    for (let i = 1; i <= count; i++) {
       const opt = document.createElement('option');
       opt.value = opt.textContent = i;
       verseSel.appendChild(opt);
@@ -550,12 +565,36 @@
     populateChapters(bookName);
     cvRow.classList.remove('hidden');
     updateRefFromDropdowns();
-    chapterSel.focus();
+    const entry = BibleApp.BIBLE_BOOKS.find(([name]) => name === bookName);
+    if (entry && entry[2] === 1) {
+      verseSel.focus();
+    } else {
+      chapterSel.focus();
+    }
   }
 
   function updateRefFromDropdowns() {
     if (!selectedBook) return;
     refInput.value = `${selectedBook} ${chapterSel.value}:${verseSel.value}`;
+  }
+
+  async function syncDropdowns(bookName, chapter, verse) {
+    const entry = BibleApp.BIBLE_BOOKS.find(([name]) => name.toLowerCase() === bookName.toLowerCase());
+    if (!entry) return;
+    selectedBook = entry[0];
+    document.querySelectorAll('.btn-book').forEach(b =>
+      b.classList.toggle('active', b.dataset.book === selectedBook)
+    );
+    chapterSel.innerHTML = '';
+    for (let i = 1; i <= entry[2]; i++) {
+      const opt = document.createElement('option');
+      opt.value = opt.textContent = i;
+      chapterSel.appendChild(opt);
+    }
+    chapterSel.value = chapter;
+    cvRow.classList.remove('hidden');
+    await populateVerses();
+    verseSel.value = verse;
   }
 
   // ── Autocomplete ──────────────────────────────────────
@@ -716,6 +755,7 @@
     navRef = BibleApp.parseReference(result.rawRef || ref);
     if (navRef) {
       refInput.value = BibleApp.buildReference(navRef.book, navRef.chapter, navRef.verse);
+      await syncDropdowns(navRef.book, navRef.chapter, navRef.verse);
     }
 
     enableControls(true);
@@ -773,8 +813,8 @@
   );
 
   // Chapter dropdown → repopulate verses and sync ref input
-  chapterSel.addEventListener('change', () => {
-    populateVerses();
+  chapterSel.addEventListener('change', async () => {
+    await populateVerses();
     updateRefFromDropdowns();
   });
 

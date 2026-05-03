@@ -83,6 +83,7 @@ const BibleApp = (() => {
   let _channel       = null;
   let _lastTimestamp = 0;
   let _onMessage     = null;
+  let _verseCountCache = {};
 
   function initChannel(role, onMessage) {
     _onMessage = onMessage;
@@ -226,6 +227,22 @@ const BibleApp = (() => {
       .trim();
   }
 
+  async function fetchVerseCount(translationCode, bookId, chapter) {
+    const cacheKey = `${translationCode}|${bookId}|${chapter}`;
+    if (_verseCountCache[cacheKey] !== undefined) return _verseCountCache[cacheKey];
+    try {
+      const url = `${API_BASE}/get-chapter/${translationCode}/${bookId}/${chapter}/`;
+      const res = await fetch(url);
+      if (!res.ok) return 50;
+      const data = await res.json();
+      const count = Array.isArray(data) ? data.length : 50;
+      _verseCountCache[cacheKey] = count;
+      return count;
+    } catch {
+      return 50;
+    }
+  }
+
   /** Parse "John 3:16" or "1 Corinthians 13:4" into parts. */
   function parseReference(str) {
     const m = str.trim().match(/^(.+?)\s+(\d+):(\d+)(?:-(\d+))?$/);
@@ -287,8 +304,9 @@ const BibleApp = (() => {
 
   return {
     initChannel, send, fetchVerse, buildDisplayText,
+    fetchVerseCount,
     parseReference, buildReference, searchBooks,
     saveSettings, loadSettings,
-    DEFAULTS, BIBLE_BOOKS, CHURCH_FONTS,
+    DEFAULTS, BIBLE_BOOKS, CHURCH_FONTS, TRANSLATION_MAP,
   };
 })();
