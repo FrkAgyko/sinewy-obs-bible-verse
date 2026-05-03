@@ -846,3 +846,50 @@ kbd {
   width: 100%;
   box-sizing: border-box;
 }
+
+/* ── Prev / Next button sizing ──────────────────────────── */
+.btn-prev,
+.btn-next {
+  min-width: 44px;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+/* ── Card section tints ─────────────────────────────────── */
+.card--translation {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.card--quick-ref {
+  background-color: rgba(201, 168, 76, 0.06);
+}
+
+.card--bible-sel {
+  background-color: rgba(88, 166, 255, 0.05);
+}
+
+.card--scripture-search {
+  background-color: rgba(160, 110, 255, 0.05);
+}
+
+.card--verse-text {
+  background-color: rgba(80, 200, 120, 0.04);
+}
+
+.card--stream {
+  background-color: rgba(220, 80, 80, 0.04);
+}
+
+/* ── Quick books row with inline Random ─────────────────── */
+.quick-books-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.quick-books-row .btn-random {
+  margin-left: auto;
+  flex-shrink: 0;
+}
