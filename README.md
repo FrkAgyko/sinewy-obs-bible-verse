@@ -106,7 +106,7 @@ The overlay is the transparent layer that sits on top of your video and displays
    - Make sure **Refresh browser when scene becomes active** is **unticked** ← this is important
 6. Click **OK**
 
-> 💡 **Tip:** If you want the overlay available in every scene, add it to a **Scene Collection** that is applied globally, or copy the source across all your scenes by right-clicking it and choosing **Copy**, then pasting into each scene.
+> **Tip:** If you want the overlay available in every scene, add it to a **Scene Collection** that is applied globally, or copy the source across all your scenes by right-clicking it and choosing **Copy**, then pasting into each scene.
 
 ---
 
