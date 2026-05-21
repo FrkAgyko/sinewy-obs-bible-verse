@@ -1,6 +1,6 @@
 # OBS Bible Verse Plugin
 
-### Display Scripture on your church livestream — no coding required.
+### Display Scripture on your church livestream, no coding required.
 
 A free, open-source tool for OBS Studio that lets you show Bible verses on your livestream with a single click. You get a control panel docked inside OBS where you type a reference, choose your style, and press **Show**. The verse appears instantly on your stream as a beautiful lower-third overlay. No servers, no subscriptions, no technical setup beyond copying a folder.
 
@@ -18,36 +18,36 @@ A free, open-source tool for OBS Studio that lets you show Bible verses on your 
 
 ## Features
 
-- **Quick Lookup buttons** — one-tap buttons for the most commonly preached books: John, Romans, Psalms, Matthew, Genesis, Proverbs, Isaiah, Hebrews, Acts, and Revelation
-- **Chapter and verse dropdowns** — after selecting a book, chapter and verse dropdowns appear automatically for fast selection without typing
-- **Auto Show toggle** — when enabled, verses automatically appear on the overlay as soon as they are looked up, no need to click Show manually
-- **Auto-scaling font size** — automatically adjusts text size based on verse length so short verses display large and long verses always fit
-- **Smart verse search** — start typing a book name and a dropdown suggests matching books automatically
-- **Instant lookup** — type any reference (e.g. `John 3:16`) and fetch the verse text with one click or press Enter
-- **Editable text** — change, shorten, or add to the verse text before it goes live on stream
-- **Next / Previous navigation** — step through consecutive verses without retyping anything
-- **Random verse generator** — pick a random verse from the Entire Bible, Old Testament, New Testament, Gospels only, or Psalms & Proverbs
-- **4 preset themes** — Classic Gold, Clean White, Dark Minimal, and Sacred Light (background image with text floating freely)
-- **Custom theme** — choose your own background colour, verse text colour, and reference text colour with a full colour picker
-- **Background image upload** — upload any photo as a fullscreen background behind your verse card
-- **Card overlay toggle** — hide the dark card so verse text sits directly on your background image with a clean look
-- **Opacity slider** — control how solid or transparent the card background is, from 0% to 100%
-- **Font selector** — choose from 9 fonts including Open Sans (default), Atkinson Hyperlegible (designed for low vision), EB Garamond, Cinzel, Playfair Display, Lora, Cormorant Garamond, and Crimson Text
-- **Font size control** — Small, Medium, Large, or X-Large
-- **3 positions** — Bottom (default), Center, or Top of screen
-- **3 animation styles** — Fade, Slide Up, or None
-- **Keyboard shortcuts** — control everything from your keyboard without touching the mouse
-- **50+ Bible translations** — KJV (default), NKJV, NIV, ESV, NLT, NASB, AMP, MSG, CSB, WEB, ASV, BBE, Darby, YLT, RSV, NET, and many more
-- **Multi-language support** — 9 languages including English, French, Portuguese, Spanish, Swahili, Arabic, Chinese, German and Russian
-- **Language selector** — filter Bible translations by language for multilingual church services
-- **Settings are remembered** — all your choices are saved automatically and restored next time you open OBS
-- **No internet required for display** — once a verse is loaded, the overlay works offline
+- **Quick Lookup buttons** for the most commonly preached books: John, Romans, Psalms, Matthew, Genesis, Proverbs, Isaiah, Hebrews, Acts, and Revelation
+- **Chapter and verse dropdowns** that appear automatically after you select a book, so you can pick quickly without typing
+- **Auto Show toggle** that sends verses to the overlay the moment they are looked up, with no need to click Show manually
+- **Auto-scaling font size** that adjusts text size based on verse length, so short verses display large and long verses always fit
+- **Smart verse search**: start typing a book name and a dropdown suggests matching books automatically
+- **Instant lookup**: type any reference (e.g. `John 3:16`) and fetch the verse text with one click or by pressing Enter
+- **Editable text**: change, shorten, or add to the verse text before it goes live on stream
+- **Next and Previous navigation** for stepping through consecutive verses without retyping anything
+- **Random verse generator** that picks a random verse from the Entire Bible, Old Testament, New Testament, Gospels only, or Psalms and Proverbs
+- **4 preset themes**: Classic Gold, Clean White, Dark Minimal, and Sacred Light (background image with text floating freely)
+- **Custom theme** that lets you choose your own background colour, verse text colour, and reference text colour with a full colour picker
+- **Background image upload** for using any photo as a fullscreen background behind your verse card
+- **Card overlay toggle** that hides the dark card so verse text sits directly on your background image with a clean look
+- **Opacity slider** for controlling how solid or transparent the card background is, from 0% to 100%
+- **Font selector** with 9 fonts including Open Sans (default), Atkinson Hyperlegible (designed for low vision), EB Garamond, Cinzel, Playfair Display, Lora, Cormorant Garamond, and Crimson Text
+- **Font size control**: Small, Medium, Large, or X-Large
+- **3 positions**: Bottom (default), Center, or Top of screen
+- **3 animation styles**: Fade, Slide Up, or None
+- **Keyboard shortcuts** so you can control everything from your keyboard without touching the mouse
+- **50+ Bible translations** including KJV (default), NKJV, NIV, ESV, NLT, NASB, AMP, MSG, CSB, WEB, ASV, BBE, Darby, YLT, RSV, NET, and many more
+- **Multi-language support** across 9 languages including English, French, Portuguese, Spanish, Swahili, Arabic, Chinese, German, and Russian
+- **Language selector** for filtering Bible translations by language for multilingual church services
+- **Settings are remembered**, so all your choices are saved automatically and restored next time you open OBS
+- **No internet required for display**: once a verse is loaded, the overlay works offline
 
 ---
 
 ## What You Need Before Starting
 
-- **OBS Studio version 28 or newer** — [download free at obsproject.com](https://obsproject.com)
+- **OBS Studio version 28 or newer** ([download free at obsproject.com](https://obsproject.com))
 - **An internet connection** when looking up verses (the verse text itself is fetched from the web)
 - The plugin folder saved somewhere on your computer
 
@@ -55,18 +55,18 @@ A free, open-source tool for OBS Studio that lets you show Bible verses on your 
 
 ## Installation
 
-### Step 1 — Download the plugin
+### Step 1: Download the plugin
 
 1. Go to the GitHub page for this project
 2. Click the green **Code** button, then click **Download ZIP**
 3. Find the downloaded ZIP file (usually in your Downloads folder)
 4. Right-click it and choose **Extract All** (Windows) or double-click to unzip (Mac)
-5. Move the extracted folder somewhere permanent — for example, your **Documents** folder
+5. Move the extracted folder somewhere permanent, for example your **Documents** folder
    > ⚠️ Do not move or rename any files inside the folder after this step. The plugin needs all its files to stay together.
 
 ---
 
-### Step 2 — Add the control panel to OBS
+### Step 2: Add the control panel to OBS
 
 The control panel is the window inside OBS where you type references and control what appears on stream.
 
@@ -89,11 +89,11 @@ The control panel is the window inside OBS where you type references and control
 
 ---
 
-### Step 3 — Add the overlay to your scene
+### Step 3: Add the overlay to your scene
 
 The overlay is the transparent layer that sits on top of your video and displays the verse text on stream.
 
-1. In OBS, select the scene you want to add the verses to (or add it to all scenes — see tip below)
+1. In OBS, select the scene you want to add the verses to (or add it to all scenes, see the tip below)
 2. In the **Sources** panel, click the **+** button
 3. Choose **Browser** from the list
 4. Give it a name like `Bible Verse Overlay` and click **OK**
@@ -115,23 +115,23 @@ The overlay is the transparent layer that sits on top of your video and displays
 ### Looking up a verse
 
 1. In the **Bible Verse** dock panel, click the reference box at the top (it says *e.g. John 3:16*)
-2. Start typing a book name — a dropdown will suggest matching books. Click one to select it, or keep typing
-3. Type the full reference, e.g. `Romans 8:28` or `Psalm 23:1-3`
+2. Start typing a book name and a dropdown will suggest matching books. Click one to select it, or keep typing
+3. Type the full reference, for example `Romans 8:28` or `Psalm 23:1-3`
 4. Choose your translation from the dropdown next to the reference box (KJV is the default)
 5. Click **Lookup** or press **Enter**
-6. The verse text appears in the text box below. You can edit it if you want — for example, to shorten a long verse
+6. The verse text appears in the text box below. You can edit it if you want, for example to shorten a long verse
 7. Click **Show** to send it to the stream
 
 ### Using the Random Verse button
 
 1. Click the **🎲 Random** button next to the Lookup button
 2. A small menu will appear with five options:
-   - **📖 Entire Bible** — any verse from Genesis to Revelation
-   - **📜 Old Testament** — Genesis through Malachi
-   - **✝ New Testament** — Matthew through Revelation
-   - **🕊 Gospels only** — Matthew, Mark, Luke, or John
-   - **🎵 Psalms & Proverbs** — a verse from Psalms or Proverbs
-3. Click your chosen option — a verse is fetched and loaded automatically
+   - **📖 Entire Bible** for any verse from Genesis to Revelation
+   - **📜 Old Testament** for Genesis through Malachi
+   - **✝ New Testament** for Matthew through Revelation
+   - **🕊 Gospels only** for Matthew, Mark, Luke, or John
+   - **🎵 Psalms and Proverbs** for a verse from Psalms or Proverbs
+3. Click your chosen option and a verse will be fetched and loaded automatically
 4. Click **Show** to send it to the stream
 
 ### Navigating verses
@@ -155,8 +155,8 @@ All display settings are in the **Display Settings** section of the dock panel.
 | **Font** | Choose the typeface for the verse text |
 | **Font Size** | Small, Medium, Large, or X-Large |
 | **Theme** | Choose a colour style (see Themes section below) |
-| **Position** | Where on screen the verse appears — Bottom, Center, or Top |
-| **Animation** | How the verse enters — Fade, Slide Up, or None |
+| **Position** | Where on screen the verse appears: Bottom, Center, or Top |
+| **Animation** | How the verse enters: Fade, Slide Up, or None |
 | **Background Opacity** | Drag the slider to make the card more or less transparent |
 
 Any change you make while the overlay is showing will update live on stream immediately.
@@ -172,17 +172,17 @@ A dark semi-transparent card with a gold top border and warm cream-coloured text
 A white semi-transparent card with a blue accent border. Dark text. Works well on any background and suits contemporary or modern church styles.
 
 ### Dark Minimal
-A dark glass card with a subtle grey border. Light text. Clean and understated — good for conferences and modern productions.
+A dark glass card with a subtle grey border. Light text. Clean and understated, ideal for conferences and modern productions.
 
 ### Sacred Light
-Your `assets/bg1.png` image fills the entire screen edge to edge. There is no dark card — the verse text floats directly over the image in white with a warm gold reference. Select this theme and your background image appears automatically with no extra steps.
+Your `assets/bg1.png` image fills the entire screen edge to edge. There is no dark card, so the verse text floats directly over the image in white with a warm gold reference. Select this theme and your background image appears automatically with no extra steps.
 
 ### Custom
 Choose your own colours. When you select **Custom…** from the Theme dropdown, three extra options appear:
 
-- **Background**, **Verse Text**, and **Reference** colour pickers — click each square to open a colour chooser
-- **Show card overlay on background** checkbox — tick this to show a semi-transparent dark card behind your text, or leave it unticked for text-only on a plain or image background
-- **Background Mode** toggle — switch between **Colour** (solid card) and **Image** (upload your own photo)
+- **Background**, **Verse Text**, and **Reference** colour pickers. Click each square to open a colour chooser
+- **Show card overlay on background** checkbox. Tick this to show a semi-transparent dark card behind your text, or leave it unticked for text-only on a plain or image background
+- **Background Mode** toggle. Switch between **Colour** (solid card) and **Image** (upload your own photo)
 
 **To upload a background image:**
 1. Select **Custom…** theme
@@ -265,7 +265,7 @@ Verse text is fetched from [Bolls.life](https://bolls.life). Over 50 translation
 | `1 Cor 13:4` | First Corinthians chapter 13 verse 4 |
 | `Genesis 1:1` | Full book names work too |
 
-Most common abbreviations are accepted — `Ps`, `Rev`, `Matt`, `1 Cor`, `Phil`, etc.
+Most common abbreviations are accepted, including `Ps`, `Rev`, `Matt`, `1 Cor`, `Phil`, and so on.
 
 ---
 
@@ -274,7 +274,7 @@ Most common abbreviations are accepted — `Ps`, `Rev`, `Matt`, `1 Cor`, `Phil`,
 ### The overlay is not showing on stream
 
 - Make sure the Browser Source is in your active scene and is **not muted or hidden** (check the eye icon next to it in the Sources panel)
-- Right-click the Browser Source in the Sources panel and choose **Refresh** — then try pressing Show again from the dock
+- Right-click the Browser Source in the Sources panel and choose **Refresh**, then try pressing Show again from the dock
 
 ### The dock panel shows a blank page
 
@@ -291,14 +291,14 @@ Most common abbreviations are accepted — `Ps`, `Rev`, `Matt`, `1 Cor`, `Phil`,
 
 ### Verse text is not loading when I click Lookup
 
-- Check your internet connection — the lookup needs access to bolls.life
-- Make sure your reference is formatted correctly, e.g. `John 3:16` not `John3:16`
+- Check your internet connection, since the lookup needs access to bolls.life
+- Make sure your reference is formatted correctly, for example `John 3:16` rather than `John3:16`
 - If the service is temporarily unavailable, type the verse text directly into the text box
 
 ### The background is not transparent in OBS
 
 - In the Browser Source properties, make sure **Width is 1920** and **Height is 1080**
-- Do **not** apply a Chroma Key filter to this source — it is already transparent
+- Do **not** apply a Chroma Key filter to this source. It is already transparent
 
 ---
 
@@ -315,13 +315,13 @@ If you find it useful, a ⭐ star on GitHub helps other churches discover the pr
 
 ## Contributing
 
-Found a bug or have a feature idea? Open an issue on GitHub — all feedback is welcome. Pull requests are also appreciated.
+Found a bug or have a feature idea? Open an issue on GitHub. All feedback is welcome, and pull requests are also appreciated.
 
 ---
 
 ## Licence
 
-MIT — see [LICENSE](LICENSE).
+MIT. See [LICENSE](LICENSE).
 
 Free for church use, personal use, and commercial use. You are welcome to modify and redistribute this project as long as you include the original licence file.
 
