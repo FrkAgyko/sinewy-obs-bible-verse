@@ -774,22 +774,28 @@
 
     let result, lastRef;
 
-    // Up to 4 attempts: first two try a random verse (1-12),
-    // later attempts fall back to verse 1 of a fresh random chapter.
-    for (let attempt = 0; attempt < 4; attempt++) {
-      const [bookName, , chapters] = books[Math.floor(Math.random() * books.length)];
-      const chapter = Math.floor(Math.random() * chapters) + 1;
-      const verse   = attempt < 2 ? Math.floor(Math.random() * 12) + 1 : 1;
-      lastRef = `${bookName} ${chapter}:${verse}`;
-      result  = await BibleApp.fetchVerse(lastRef, translationSel.value);
-      if (!result.error) break;
+    try {
+      // Up to 4 attempts: first two try a random verse (1-12),
+      // later attempts fall back to verse 1 of a fresh random chapter.
+      for (let attempt = 0; attempt < 4; attempt++) {
+        const [bookName, , chapters] = books[Math.floor(Math.random() * books.length)];
+        const chapter = Math.floor(Math.random() * chapters) + 1;
+        const verse   = attempt < 2 ? Math.floor(Math.random() * 12) + 1 : 1;
+        lastRef = `${bookName} ${chapter}:${verse}`;
+        console.log('[BibleApp] random attempt', attempt + 1, lastRef, 'translation=', translationSel.value);
+        result  = await BibleApp.fetchVerse(lastRef, translationSel.value);
+        if (!result.error) break;
+      }
+    } catch (e) {
+      console.error('[BibleApp] doRandomVerse threw:', e);
+      result = { error: 'Random verse failed: ' + (e && e.message ? e.message : e) };
+    } finally {
+      btnRandom.disabled = false;
+      btnRandom.classList.remove('loading');
     }
 
-    btnRandom.disabled = false;
-    btnRandom.classList.remove('loading');
-
-    if (result.error) {
-      setStatus(result.error, 'error');
+    if (!result || result.error) {
+      setStatus((result && result.error) || 'No verse found.', 'error');
       return;
     }
 
@@ -822,13 +828,20 @@
     btnLookup.classList.add('loading');
     setStatus('Fetching verse…', 'loading');
 
-    const result = await BibleApp.fetchVerse(ref, translationSel.value);
+    let result;
+    try {
+      console.log('[BibleApp] lookup', ref, 'translation=', translationSel.value);
+      result = await BibleApp.fetchVerse(ref, translationSel.value);
+    } catch (e) {
+      console.error('[BibleApp] doLookup threw:', e);
+      result = { error: 'Lookup failed: ' + (e && e.message ? e.message : e) };
+    } finally {
+      btnLookup.disabled = false;
+      btnLookup.classList.remove('loading');
+    }
 
-    btnLookup.disabled = false;
-    btnLookup.classList.remove('loading');
-
-    if (result.error) {
-      setStatus(result.error, 'error');
+    if (!result || result.error) {
+      setStatus((result && result.error) || 'No verse found.', 'error');
       return;
     }
 

@@ -85,6 +85,18 @@ const BibleApp = (() => {
   let _onMessage     = null;
   let _verseCountCache = {};
   let _searchCache = {};
+  const FETCH_TIMEOUT_MS = 10000;
+
+  // fetch with hard timeout so OBS/CEF can never hang the UI forever
+  async function _fetchWithTimeout(url) {
+    const ctrl = typeof AbortController !== 'undefined' ? new AbortController() : null;
+    const timer = ctrl ? setTimeout(() => ctrl.abort(), FETCH_TIMEOUT_MS) : null;
+    try {
+      return await fetch(url, ctrl ? { signal: ctrl.signal } : undefined);
+    } finally {
+      if (timer) clearTimeout(timer);
+    }
+  }
 
   function initChannel(role, onMessage) {
     _onMessage = onMessage;
@@ -170,7 +182,7 @@ const BibleApp = (() => {
         // Multi-verse range — fetch each verse individually
         for (let v = verse; v <= endVerse; v++) {
           const url = `${API_BASE}/get-verse/${translationCode}/${bookId}/${chapter}/${v}/`;
-          const res = await fetch(url);
+          const res = await _fetchWithTimeout(url);
           if (!res.ok) {
             return { error: `Verse not found. Check the reference and translation.` };
           }
@@ -211,10 +223,14 @@ const BibleApp = (() => {
       };
 
     } catch (err) {
+      console.error('[BibleApp] fetchVerse failed:', err);
+      if (err && err.name === 'AbortError') {
+        return { error: 'Request timed out after 10s. Check your connection or OBS browser permissions.' };
+      }
       if (err instanceof TypeError) {
         return { error: 'Network error. Check your internet connection.' };
       }
-      return { error: 'An unexpected error occurred. Please try again.' };
+      return { error: 'Unexpected error: ' + (err && err.message ? err.message : err) };
     }
   }
 
